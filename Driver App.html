@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Park King</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --b9:#060B20;--b8:#0C1235;--b7:#101A4A;--b6:#1A2E8A;
+  --b5:#1E4ED8;--b4:#3B68F0;--b3:#7B9BF8;--b2:#B8CAFE;--b1:#E8EFFE;--b0:#F2F5FF;
+  --ac:#00D4FF;--gr:#10B981;--gr2:#ECFDF5;--gr3:#D1FAE5;
+  --rd:#EF4444;--rd2:#FEF2F2;--rd3:#FEE2E2;
+  --or:#F59E0B;--or2:#FFFBEB;
+  --tx:#0A0F2C;--t2:#4B5563;--t3:#9CA3AF;
+  --bdr:#E5EAFF;--wh:#FFFFFF;
+  --sh:0 1px 8px rgba(10,15,44,0.07);
+  --r:13px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#04081A 0%,#0C1235 60%,#08102A 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(30,78,216,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(30,78,216,0.04) 1px,transparent 1px);
+  background-size:36px 36px;pointer-events:none;}
+
+.phone{width:393px;height:852px;background:#F0F2FF;border-radius:46px;overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.07),0 40px 80px rgba(0,0,0,0.7),0 0 50px rgba(30,78,216,0.2);}
+
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:#F0F2FF;}
+.screen.active{display:flex;animation:sIn .18s ease;}
+@keyframes sIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+
+/* STATUS BAR */
+.sb{padding:12px 22px 6px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.sb.dk{background:var(--b9);}  .sb-t{font-size:15px;font-weight:700;color:white;}
+.sb-i{display:flex;gap:4px;align-items:center;} .sb-i svg{width:13px;height:13px;fill:white;}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,var(--b9) 0%,var(--b7) 55%,var(--b6) 100%);
+  padding:5px 14px 11px;flex-shrink:0;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;bottom:-30px;right:-20px;width:120px;height:120px;
+  background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 70%);border-radius:50%;}
+.hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.brand{display:flex;align-items:center;gap:7px;}
+.brand-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--b4),var(--ac));
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-icon svg{width:15px;height:15px;fill:white;}
+.brand-name{color:white;font-size:13px;font-weight:800;letter-spacing:-.3px;line-height:1.1;}
+.brand-user{color:var(--b3);font-size:9px;font-weight:500;}
+.hero-btns{display:flex;gap:5px;}
+.hbtn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.hbtn svg{width:14px;height:14px;fill:white;}
+
+/* STATS */
+.stat-strip{display:flex;gap:5px;}
+.stp{flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:7px 5px;text-align:center;}
+.stp-n{color:white;font-size:17px;font-weight:800;line-height:1;}
+.stp-n.ac{color:var(--ac);} .stp-n.rd{color:#FF7070;} .stp-n.gr{color:#34D399;} .stp-n.or{color:#FBBF24;}
+.stp-l{color:rgba(255,255,255,0.4);font-size:8px;font-weight:600;margin-top:1px;text-transform:uppercase;letter-spacing:.3px;}
+
+/* UPLOAD */
+.upload-banner{background:linear-gradient(90deg,#92400E,#B45309);padding:5px 12px;
+  font-size:10px;font-weight:700;color:white;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.upload-banner svg{width:12px;height:12px;fill:white;flex-shrink:0;}
+
+/* TOP BAR */
+.topbar{background:white;padding:7px 10px;display:flex;align-items:center;
+  border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.topbar-left{flex:1;min-width:0;}
+.topbar-title{font-size:11px;font-weight:800;color:var(--tx);text-transform:uppercase;letter-spacing:.5px;}
+.topbar-sub{font-size:10px;color:var(--t3);}
+.topbar-sub b.in{color:var(--gr);font-weight:800;} .topbar-sub b.out{color:var(--rd);font-weight:800;}
+.topbar-right{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.icon-btn{width:32px;height:32px;border-radius:9px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.icon-btn svg{width:15px;height:15px;}
+.icon-btn.search-btn{background:var(--b1);} .icon-btn.search-btn svg{fill:var(--b5);}
+.icon-btn.filter-btn{background:var(--b1);} .icon-btn.filter-btn svg{fill:var(--b5);}
+.icon-btn.filter-btn.active{background:var(--b5);} .icon-btn.filter-btn.active svg{fill:white;}
+
+/* SEARCH OVERLAY */
+.search-overlay{background:white;padding:7px 10px;display:none;align-items:center;gap:7px;
+  border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.search-overlay.show{display:flex;}
+.search-inp{flex:1;border:1.5px solid var(--b2);border-radius:9px;padding:7px 11px;
+  font-family:inherit;font-size:13px;color:var(--tx);outline:none;background:var(--b0);}
+.search-inp:focus{border-color:var(--b5);}
+.search-cancel{background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--b5);white-space:nowrap;}
+
+/* FILTER TABS */
+.ftabs{background:white;display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bdr);flex-shrink:0;padding:0 8px;}
+.ftabs::-webkit-scrollbar{display:none;}
+.ftab{white-space:nowrap;padding:8px 12px;font-size:11px;font-weight:600;cursor:pointer;
+  border:none;background:none;font-family:inherit;color:var(--t3);border-bottom:2px solid transparent;transition:all .12s;flex-shrink:0;}
+.ftab.on{color:var(--b5);border-bottom-color:var(--b5);}
+
+/* DATE HEADER */
+.date-hdr{padding:5px 12px 3px;background:var(--b1);font-size:10px;font-weight:700;color:var(--b5);
+  text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;flex-shrink:0;}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;}
+.scroll::-webkit-scrollbar{display:none;}
+
+/* ─── BOOKING ROW ─── */
+.brow{background:white;margin:0 8px 4px;border-radius:10px;overflow:hidden;cursor:pointer;
+  border:1px solid var(--bdr);box-shadow:var(--sh);transition:transform .1s;display:flex;align-items:stretch;}
+.brow:active{transform:scale(0.988);}
+.brow.noshow{opacity:.38;filter:grayscale(.6);}
+
+/* MENU SLIDE */
+#menu.slide{transform:translateX(0);}
+
+/* left stripe — vivid green=IN, vivid red=OUT */
+.brow-stripe{width:5px;flex-shrink:0;}
+/* row backgrounds — due bookings same color family as type, just lighter */
+.bg-in   {background:#EDFBF0 !important;}  /* vivid green tint */
+.bg-out  {background:#FEF0F0 !important;}  /* vivid red tint */
+.bg-due-in  {background:#EDFBF0 !important;}  /* green due = green bg */
+.bg-due-out {background:#FEF0F0 !important;}  /* red due = red bg */
+.bg-done {background:#F5FFF9 !important;}
+
+/* time col */
+.brow-l{width:54px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:5px 2px;border-right:1px solid var(--bdr);}
+.brow-time{font-size:14px;font-weight:900;color:var(--tx);font-family:'JetBrains Mono',monospace;line-height:1;letter-spacing:-.5px;}
+
+/* main */
+.brow-m{flex:1;padding:6px 7px 5px;min-width:0;}
+.row1{display:flex;align-items:center;gap:4px;margin-bottom:1px;flex-wrap:nowrap;}
+/* Provider tag: never truncate */
+.ptag{font-size:8px;font-weight:700;padding:1px 6px;border-radius:4px;border:1px solid;white-space:nowrap;flex-shrink:0;}
+.brow-plate{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:900;color:var(--tx);white-space:nowrap;letter-spacing:-.3px;}
+
+/* bus icon */
+.brow-bus{width:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 1px;}
+.brow-bus svg{width:12px;height:12px;}
+
+/* main */
+.brow-m{flex:1;padding:6px 7px 5px;min-width:0;}
+.row1{display:flex;align-items:center;gap:4px;margin-bottom:1px;flex-wrap:nowrap;}
+.comment-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;}
+.row2{font-size:11px;color:var(--t2);margin-bottom:1px;font-weight:500;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.row3{display:flex;align-items:center;gap:5px;}
+.brow-car{font-size:10px;color:var(--t3);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* RIGHT COL */
+.brow-r{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+  padding:5px 7px 5px 3px;gap:4px;flex-shrink:0;}
+.price-tag{font-size:10px;font-weight:800;padding:2px 5px;border-radius:5px;border:1.5px solid;text-align:center;}
+.price-due{background:var(--rd2);color:var(--rd);border-color:var(--rd);}
+.pax-tag{display:flex;align-items:center;gap:2px;font-size:10px;font-weight:600;color:var(--t3);}
+.pax-tag svg{width:10px;height:10px;fill:var(--t3);}
+.print-btn{width:26px;height:26px;border-radius:7px;background:var(--b1);border:1px solid var(--b2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;}
+.print-btn:active{background:var(--b5);}
+.print-btn svg{width:13px;height:13px;fill:var(--b5);}
+.print-btn:active svg{fill:white;}
+.phone-indicator{display:inline-flex;align-items:center;gap:3px;
+  background:#FFF7ED;border:1px solid #FED7AA;border-radius:4px;padding:1px 5px;}
+.phone-indicator svg{width:8px;height:8px;fill:#EA580C;flex-shrink:0;}
+.phone-indicator span{font-size:8px;font-weight:700;color:#EA580C;line-height:1.3;white-space:nowrap;}
+
+/* flight live */
+.ft-live{display:inline-flex;align-items:center;gap:3px;
+  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:4px;padding:1px 5px;}
+.ft-dot{width:5px;height:5px;border-radius:50%;background:var(--rd);animation:pulse 1s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.ft-txt{font-size:9px;font-weight:700;color:var(--rd);font-family:'JetBrains Mono',monospace;}
+
+/* ─── DETAIL ─── */
+.det-hero{background:linear-gradient(150deg,var(--b9),var(--b7));padding:7px 14px 14px;flex-shrink:0;position:relative;overflow:hidden;}
+.det-hero::after{content:'';position:absolute;top:-20px;right:-20px;width:110px;height:110px;background:radial-gradient(circle,rgba(0,212,255,0.12) 0%,transparent 70%);border-radius:50%;}
+.back-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.back-btn{background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;color:rgba(255,255,255,0.8);font-size:13px;font-weight:600;}
+.back-btn svg{width:15px;height:15px;fill:rgba(255,255,255,0.8);}
+.gear-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.gear-btn svg{width:14px;height:14px;fill:white;}
+.det-extid{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--b3);margin-bottom:7px;}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.det-box{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px;}
+.dbl{font-size:8px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.dbv{color:white;font-size:11px;font-weight:700;}
+.dbs{color:var(--b3);font-size:9px;}
+.dbl-link{color:var(--ac);font-size:9px;}
+
+/* DATE BOXES */
+.date-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px;}
+.dbox{background:white;border-radius:10px;padding:10px;border:1px solid var(--bdr);box-shadow:var(--sh);position:relative;overflow:hidden;}
+.dbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.dbox.ci::before{background:linear-gradient(90deg,var(--b5),var(--ac));}
+.dbox.co::before{background:linear-gradient(90deg,var(--rd),#FF8C42);}
+.dbox-lbl{font-size:8px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.dbox-date{font-size:12px;font-weight:800;color:var(--tx);}
+.dbox-time{font-size:10px;color:var(--t2);}
+.dbox-status{font-size:9px;font-weight:700;margin-top:2px;}
+.dbox-btns{display:flex;gap:4px;margin-top:7px;}
+.dbox-action{flex:1;padding:6px 4px;border:none;border-radius:7px;font-family:inherit;font-size:10px;font-weight:700;cursor:pointer;}
+.ci-btn{background:var(--b5);color:white;} .co-btn{background:var(--rd);color:white;}
+.dbox-phone{width:24px;height:24px;border-radius:7px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dbox-phone svg{width:11px;height:11px;}
+.dbox-phone.blue{background:var(--b1);} .dbox-phone.blue svg{fill:var(--b5);}
+.dbox-phone.red{background:var(--rd2);} .dbox-phone.red svg{fill:var(--rd);}
+.flight-bar{background:linear-gradient(135deg,#1C1C3A,#2A1A6E);border-radius:9px;
+  padding:8px 11px;display:flex;align-items:center;gap:7px;margin-bottom:9px;
+  border:1px solid rgba(124,58,237,0.25);box-shadow:0 2px 10px rgba(124,58,237,0.12);}
+.flight-bar svg{width:14px;height:14px;fill:var(--ac);flex-shrink:0;}
+.fl-num{color:white;font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.fl-plan{color:rgba(255,255,255,0.4);font-size:8px;}
+.fl-live{color:var(--rd);font-size:11px;font-weight:800;display:flex;align-items:center;gap:3px;}
+
+/* CARDS */
+.card{background:white;border-radius:10px;overflow:hidden;margin-bottom:8px;box-shadow:var(--sh);border:1px solid var(--bdr);}
+.card-hd{padding:7px 11px;font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr);}
+.card-bd{padding:9px 11px;}
+.cost-row{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);padding:3px 0;border-bottom:1px solid var(--bdr);}
+.cost-row:last-child{border-bottom:none;}
+.cost-due{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:var(--rd);padding:7px 0 2px;border-top:2px solid var(--rd3);}
+.cost-paid{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:var(--gr);padding:7px 0 2px;border-top:2px solid var(--gr3);}
+.pay-btns{display:flex;gap:6px;margin-bottom:9px;}
+.pay-btn{flex:1;padding:10px 7px;border:none;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.pay-primary{background:var(--b5);color:white;box-shadow:0 3px 10px rgba(30,78,216,0.22);}
+.pay-sec{background:white;color:var(--b5);border:1.5px solid var(--b2);}
+.shuttle-bar{background:linear-gradient(135deg,var(--b8),var(--b7));border-radius:9px;
+  padding:8px 11px;display:flex;align-items:center;gap:8px;margin-bottom:8px;border:1px solid rgba(59,104,240,0.2);}
+.shuttle-txt{color:white;font-size:10px;font-weight:700;}
+.shuttle-sub{color:rgba(255,255,255,0.5);font-size:8px;}
+.shuttle-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ─── OVERLAYS (shared) ─── */
+.overlay{position:absolute;inset:0;z-index:300;background:rgba(0,0,0,0.45);
+  display:none;align-items:flex-end;backdrop-filter:blur(3px);}
+.overlay.open{display:flex;}
+.sheet{width:100%;background:white;border-radius:22px 22px 0 0;padding:0 0 26px;
+  transform:translateY(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);}
+.overlay.open .sheet{transform:none;}
+.s-handle{width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:10px auto 12px;}
+.s-title{font-size:14px;font-weight:800;color:var(--tx);padding:0 16px 10px;border-bottom:1px solid var(--bdr);}
+.s-item{display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;background:none;border:none;font-family:inherit;width:100%;border-bottom:1px solid var(--bdr);}
+.s-item:last-child{border-bottom:none;}
+.s-item:active{background:var(--b0);}
+.s-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.s-icon svg{width:16px;height:16px;fill:white;}
+.s-lbl{font-size:13px;font-weight:700;color:var(--tx);text-align:left;}
+.s-sub{font-size:10px;color:var(--t3);text-align:left;}
+.s-cancel{margin:10px 14px 0;width:calc(100% - 28px);padding:11px;border-radius:9px;background:var(--b0);border:none;font-family:inherit;font-size:13px;font-weight:700;color:var(--t2);cursor:pointer;}
+
+/* ─── FILTER SHEET ─── */
+.filter-sheet-inner{width:100%;background:white;border-radius:22px 22px 0 0;padding:0;
+  transform:translateY(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.overlay.open .filter-sheet-inner{transform:none;}
+.fs-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.fs-close{background:none;border:none;cursor:pointer;font-size:12px;font-weight:700;color:var(--b5);font-family:inherit;}
+.fs-save{background:var(--b5);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.fs-scroll{flex:1;overflow-y:auto;scrollbar-width:none;padding:14px 16px;}
+.fs-scroll::-webkit-scrollbar{display:none;}
+.fs-section{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px;}
+.fs-date-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--b0);border:1.5px solid var(--bdr);border-radius:9px;margin-bottom:10px;cursor:pointer;}
+.fs-date-lbl{font-size:12px;color:var(--t2);}
+.fs-date-val{font-size:13px;font-weight:800;color:var(--tx);}
+.fs-today{display:flex;align-items:center;gap:6px;padding:8px 13px;border:1.5px solid var(--b5);border-radius:8px;cursor:pointer;background:white;font-family:inherit;font-size:12px;font-weight:700;color:var(--b5);margin-bottom:14px;}
+.fs-today svg{width:14px;height:14px;fill:var(--b5);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--bdr);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-lbl{font-size:13px;color:var(--tx);}
+.toggle{width:44px;height:26px;border-radius:13px;background:#D1D5DB;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--b5);}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.toggle.on::after{transform:translateX(18px);}
+.type-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.type-btn{padding:7px 16px;border-radius:20px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t2);transition:all .12s;}
+.type-btn.on{background:var(--b5);color:white;border-color:var(--b5);}
+
+/* ─── SEARCH SCREEN ─── */
+#s-search{background:white;}
+.search-hd{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.search-hd-inp{flex:1;border:1.5px solid var(--b2);border-radius:9px;padding:8px 12px;font-family:inherit;font-size:13px;color:var(--tx);outline:none;}
+.search-hd-inp:focus{border-color:var(--b5);}
+.search-hd-cancel{background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--b5);}
+.search-result{background:white;margin:0 10px 4px;border-radius:9px;padding:10px 12px;border:1px solid var(--bdr);cursor:pointer;box-shadow:var(--sh);}
+.search-result:active{background:var(--b0);}
+.sr-plate{font-size:14px;font-weight:800;color:var(--tx);font-family:'JetBrains Mono',monospace;}
+.sr-name{font-size:12px;color:var(--t2);margin-top:1px;}
+.sr-meta{font-size:10px;color:var(--t3);margin-top:1px;}
+.search-empty{text-align:center;padding:50px 20px;color:var(--t3);}
+.search-empty div{font-size:28px;margin-bottom:8px;}
+
+/* ─── PHOTO SCREEN ─── */
+.photo-grid-big{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:10px;}
+.pg-cell{aspect-ratio:4/3;border-radius:11px;border:2px dashed var(--b2);background:white;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;transition:all .12s;position:relative;}
+.pg-cell:active{transform:scale(0.97);}
+.pg-cell.done{border-style:solid;border-color:var(--gr);background:var(--gr2);}
+.pg-cell.done::after{content:'✓';position:absolute;top:5px;right:7px;font-size:13px;color:var(--gr);font-weight:800;}
+.pg-cell svg{width:22px;height:22px;fill:var(--b4);}
+.pg-cell.done svg{fill:var(--gr);}
+.pg-cell span{font-size:11px;font-weight:700;color:var(--b5);}
+.pg-cell.done span{color:var(--gr);}
+.skip-btn{margin:0 10px;padding:10px;background:white;border:1.5px solid var(--bdr);border-radius:9px;font-family:inherit;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;width:calc(100% - 20px);}
+
+/* ─── KM / FORM ─── */
+.form-section{background:white;border-radius:10px;overflow:hidden;margin-bottom:8px;box-shadow:var(--sh);border:1px solid var(--bdr);}
+.form-sec-hd{padding:7px 11px;font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr);}
+.form-row{display:flex;align-items:center;padding:9px 11px;border-bottom:1px solid var(--bdr);}
+.form-row:last-child{border-bottom:none;}
+.form-lbl{font-size:12px;color:var(--t2);flex:1;}
+.form-inp{border:none;outline:none;font-family:inherit;font-size:13px;color:var(--tx);text-align:right;background:transparent;flex:1;}
+.form-inp::placeholder{color:var(--t3);}
+.form-inp.mono{font-family:'JetBrains Mono',monospace;font-weight:700;}
+.check-row{display:flex;align-items:center;gap:9px;padding:9px 11px;border-bottom:1px solid var(--bdr);cursor:pointer;}
+.check-row:last-child{border-bottom:none;}
+.checkbox{width:19px;height:19px;border-radius:5px;border:2px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;}
+.checkbox.on{background:var(--b5);border-color:var(--b5);}
+.checkbox svg{width:11px;height:11px;fill:white;display:none;}
+.checkbox.on svg{display:block;}
+.sig-box{border:2px dashed var(--b2);border-radius:9px;background:white;height:90px;
+  margin:9px 11px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.sig-box span{font-size:11px;color:var(--t3);}
+.pay-method-btn{padding:7px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t2);transition:all .12s;}
+.pay-method-btn.on{background:var(--b5);color:white;border-color:var(--b5);}
+
+/* ─── CHAT SCREEN ─── */
+.chat-hd{background:linear-gradient(150deg,var(--b9),var(--b7));padding:7px 14px 12px;flex-shrink:0;}
+.chat-list{display:flex;flex-direction:column;}
+.chat-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bdr);cursor:pointer;background:white;}
+.chat-item:active{background:var(--b0);}
+.chat-avatar{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:800;color:white;}
+.chat-name{font-size:13px;font-weight:700;color:var(--tx);}
+.chat-last{font-size:11px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-time{font-size:10px;color:var(--t3);flex-shrink:0;}
+.chat-unread{width:18px;height:18px;background:var(--b5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:white;flex-shrink:0;}
+
+/* CHAT CONV */
+.chat-conv-hd{background:white;padding:8px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;scrollbar-width:none;}
+.chat-msgs::-webkit-scrollbar{display:none;}
+.msg{margin-bottom:10px;display:flex;flex-direction:column;}
+.msg.me{align-items:flex-end;}
+.msg.them{align-items:flex-start;}
+.msg-bubble{max-width:72%;padding:8px 11px;border-radius:14px;font-size:12px;line-height:1.4;}
+.msg.me .msg-bubble{background:var(--b5);color:white;border-bottom-right-radius:4px;}
+.msg.them .msg-bubble{background:white;color:var(--tx);border-bottom-left-radius:4px;box-shadow:var(--sh);border:1px solid var(--bdr);}
+.msg-time{font-size:9px;color:var(--t3);margin-top:3px;padding:0 2px;}
+.chat-input-bar{background:white;padding:8px 10px;display:flex;gap:7px;align-items:center;border-top:1px solid var(--bdr);flex-shrink:0;}
+.chat-inp{flex:1;border:1.5px solid var(--bdr);border-radius:20px;padding:7px 13px;font-family:inherit;font-size:13px;outline:none;background:var(--b0);}
+.chat-inp:focus{border-color:var(--b5);}
+.chat-send{width:34px;height:34px;border-radius:50%;background:var(--b5);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-send svg{width:15px;height:15px;fill:white;}
+
+/* ─── EMPLOYEES ─── */
+.shift-card{background:white;border-radius:10px;overflow:hidden;margin:0 8px 7px;box-shadow:var(--sh);border:1px solid var(--bdr);}
+.shift-hd{padding:8px 11px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--bdr);}
+.shift-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.shift-title{font-size:11px;font-weight:700;color:var(--tx);}
+.shift-time{font-size:9px;color:var(--t3);}
+.shift-emp{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;border-bottom:1px solid var(--bdr);}
+.shift-emp:last-child{border-bottom:none;}
+.shift-name{font-size:11px;font-weight:600;color:var(--tx);}
+.shift-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;}
+
+/* ─── LABEL / EDIT / PAY sheets ─── */
+#label-preview{position:absolute;inset:0;z-index:400;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+#label-preview.open{display:flex;}
+.label-card{background:white;border-radius:13px;padding:14px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.label-return{font-size:26px;font-weight:800;color:var(--tx);line-height:1;}
+.label-time{font-size:17px;font-weight:700;color:var(--b5);}
+.label-hr{border:none;border-top:1.5px dashed var(--bdr);margin:9px 0;}
+.label-info{font-size:10px;color:var(--t2);line-height:1.7;}
+.label-btns{display:flex;gap:7px;margin-top:12px;}
+.label-btn{flex:1;padding:9px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:none;}
+
+/* ─── TAB BAR ─── */
+.tabbar{background:white;display:grid;grid-template-columns:repeat(4,1fr);
+  padding:5px 4px 15px;flex-shrink:0;box-shadow:0 -2px 10px rgba(10,15,44,0.07);border-top:1px solid var(--bdr);}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+  padding:4px;border-radius:7px;background:none;border:none;font-family:inherit;transition:all .1s;position:relative;}
+.tab:active{background:var(--b1);}
+.tab svg{width:19px;height:19px;fill:var(--t3);}
+.tab span{font-size:8px;color:var(--t3);font-weight:500;}
+.tab.on svg{fill:var(--b5);} .tab.on span{color:var(--b5);font-weight:700;}
+.tab-badge{position:absolute;top:1px;right:6px;width:14px;height:14px;background:var(--rd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:white;}
+
+/* SUCCESS */
+#success{position:absolute;inset:0;z-index:500;background:linear-gradient(150deg,var(--b9),var(--b7));display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;}
+#success.show{display:flex;}
+.s-ring{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 0 32px rgba(0,212,255,0.2);}
+.s-ring svg{width:44px;height:44px;fill:var(--ac);}
+.s-t{color:white;font-size:20px;font-weight:800;text-align:center;letter-spacing:-.5px;}
+.s-s{color:rgba(255,255,255,0.5);font-size:11px;text-align:center;margin-top:5px;margin-bottom:28px;}
+.s-btn{background:white;color:var(--b7);padding:11px 30px;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;border:none;font-family:inherit;}
+</style>
+</head>
+<body>
+<div id="modal-root" style="position:fixed;inset:0;z-index:99999;pointer-events:none;display:block;"></div>
+<div class="phone">
+
+<!-- ══════════════════════════════════════
+     SCREEN: LISTE
+══════════════════════════════════════ -->
+<div class="screen active" id="s-list">
+  <div class="sb dk"><span class="sb-t">02:05</span><div class="sb-i"><svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg><svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+
+  <div class="hero">
+    <div class="hero-top">
+      <div class="brand">
+        <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg></div>
+        <div><div class="brand-name">Hallo, Mohammad Pervez Rana</div></div>
+      </div>
+      <div class="hero-btns"></div>
+    </div>
+    <div class="stat-strip">
+      <div class="stp"><div class="stp-n ac" id="st0">15</div><div class="stp-l">Gesamt</div></div>
+      <div class="stp"><div class="stp-n gr" id="st1">8</div><div class="stp-l">Annahmen</div></div>
+      <div class="stp"><div class="stp-n rd" id="st2">7</div><div class="stp-l">Rückgaben</div></div>
+      <div class="stp"><div class="stp-n or" id="st3">5</div><div class="stp-l">Übrig</div></div>
+    </div>
+  </div>
+
+  <div class="upload-banner">
+    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+    <span><strong>4 Medien-Uploads</strong> in der Warteschlange</span>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="hdr-txt">Offen Buchungen Heute</div>
+      <div class="topbar-sub">Heute: <b class="in" id="hdr-total">15</b> &nbsp;Zahlungen: <b style="color:var(--or);font-weight:800;" id="hdr-due">82,00 €</b> &nbsp;Bezahlt: <b class="in" id="hdr-paid">0,00 €</b></div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn search-btn" onclick="openSearch()">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      </button>
+      <button class="icon-btn filter-btn" id="filter-icon-btn" onclick="openFilterSheet()">
+        <svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="ftabs">
+    <button class="ftab on" onclick="setF('all',this)">Alle</button>
+    <button class="ftab" onclick="setF('tomorrow',this)">Morgen</button>
+    <button class="ftab" onclick="setF('annahme',this)">Annahme</button>
+    <button class="ftab" onclick="setF('abgabe',this)">Abgabe</button>
+    <button class="ftab" onclick="setF('print',this)" id="tab-print">Druckvorgang</button>
+  </div>
+
+  <div class="scroll" style="padding-top:4px;padding-bottom:8px;" id="list-wrap"></div>
+
+  <div class="tabbar">
+    <button class="tab on"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg><span>Buchungen</span></button>
+    <button class="tab" onclick="go('s-checkin')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Neu</span></button>
+    <button class="tab" onclick="go('s-chat-list')"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg><span>Chat</span></button>
+    <button class="tab" onclick="go('s-employees')"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Mitarbeiter</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: SUCHE
+══════════════════════════════════════ -->
+<div class="screen" id="s-search">
+  <div class="sb dk"><span class="sb-t">02:05</span></div>
+  <div class="search-hd">
+    <input id="search-main-inp" class="search-hd-inp" type="text" placeholder="Name, Kennzeichen, Handynummer, Buchungs-ID…" oninput="doSearch(this.value)" autofocus>
+    <button class="search-hd-cancel" onclick="go('s-list')">Abbrechen</button>
+  </div>
+  <div class="scroll" style="padding-top:8px;" id="search-results">
+    <div class="search-empty"><div>🔍</div><div style="font-size:13px;font-weight:600;color:var(--t2);">Tippe um zu suchen</div><div style="font-size:11px;margin-top:4px;">Name · Kennzeichen · Handynummer · Buchungs-ID</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: DETAIL
+══════════════════════════════════════ -->
+<div class="screen" id="s-detail">
+  <div class="sb dk"><span class="sb-t">02:09</span></div>
+  <div class="det-hero">
+    <div class="back-row">
+      <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Zurück</button>
+      <span style="color:white;font-size:13px;font-weight:700;">Buchung #E3SSZZZ</span>
+      <div style="width:30px;"></div>
+    </div>
+    <div class="det-extid">Extern ID: F-DE-2025/11/101663</div>
+    <div class="det-grid">
+      <div class="det-box">
+        <div class="dbl">Kunde</div>
+        <div class="dbv">Horst Pust</div>
+        <div class="dbl-link">015733910609</div>
+        <div class="dbl-link" style="font-size:8px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e880879a9b9c989d9b9ca89cc587868481868dc68c8d">[email&#160;protected]</a></div>
+        <div class="dbs">2 Personen</div>
+      </div>
+      <div class="det-box">
+        <div class="dbl">Fahrzeug</div>
+        <div class="dbv" style="font-family:'JetBrains Mono',monospace;font-size:13px;">LRO HM 85</div>
+        <div style="margin-top:6px;">
+          <span id="det-key-badge" style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:8px;font-weight:700;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.15);color:#FCA5A5;">🔑 Schlüssellos</span>
+        </div>
+        <button onclick="go('s-km')" style="margin-top:5px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:white;font-size:8px;font-weight:700;padding:3px 7px;cursor:pointer;font-family:inherit;">+ KM UND KOMMENTAR</button>
+      </div>
+    </div>
+  </div>
+  <div class="scroll" style="padding:9px 9px 14px;">
+    <button onclick="showSettSheet()" style="width:100%;padding:10px 14px;background:white;border:1.5px solid #E5EAFF;border-radius:10px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:#1E4ED8;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:9px;box-shadow:0 1px 8px rgba(10,15,44,0.07);">
+      <svg style="width:15px;height:15px;fill:#1E4ED8;" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Buchungsoptionen
+    </button>
+    <!-- WASH CARD — only for bookings with wash -->
+    <div style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1.5px solid #86EFAC;border-radius:10px;padding:11px 13px;margin-bottom:9px;display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:10px;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">🫧</div>
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:800;color:#065F46;">Autowäsche gebucht</div>
+        <div style="font-size:10px;color:#059669;font-weight:600;margin-top:1px;">Innen &amp; Außen · bei Rückgabe</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:#10B981;color:white;">Offen</span>
+        <button onclick="this.parentElement.previousElementSibling.previousElementSibling.textContent='';this.closest('div[style]').style.background='linear-gradient(135deg,#F0FDF4,#DCFCE7)';this.textContent='✓ Erledigt';this.style.background='#059669';" style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:5px;background:white;border:1px solid #86EFAC;color:#10B981;cursor:pointer;">Als erledigt markieren</button>
+      </div>
+    </div>
+    <div class="date-grid">
+      <div class="dbox ci">
+        <div class="dbox-lbl">Parkdatum</div>
+        <div class="dbox-date">Mi. 4 März 2026</div>
+        <div class="dbox-time">12:00 · KM: 0</div>
+        <div class="dbox-status" style="color:var(--gr);">✓ Checked-in · 12:00</div>
+        <div class="dbox-btns">
+          <button class="dbox-action ci-btn" onclick="go('s-photo-ci')">✓ Check-in</button>
+          <button class="dbox-phone blue" onclick="openSheet('phone-sheet')"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button>
+        </div>
+        <div style="background:var(--gr);border-radius:5px;padding:3px 7px;margin-top:5px;display:flex;align-items:center;gap:4px;"><svg style="width:10px;height:10px;fill:white;" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span style="color:white;font-size:9px;font-weight:800;font-family:'JetBrains Mono',monospace;">U22996</span></div>
+      </div>
+      <div class="dbox co">
+        <div class="dbox-lbl">Datum Retour</div>
+        <div class="dbox-date">Mo. 9 März 2026</div>
+        <div class="dbox-time">16:00 · KM: 0</div>
+        <div class="dbox-status" style="color:var(--rd);">● Rückgabe</div>
+        <div class="dbox-btns">
+          <button class="dbox-action co-btn" onclick="go('s-photo-co')">⇥ Check-out</button>
+          <button class="dbox-phone red" onclick="openSheet('phone-sheet')"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button>
+        </div>
+        <div style="background:var(--rd);border-radius:5px;padding:3px 7px;margin-top:5px;display:flex;align-items:center;gap:4px;"><svg style="width:10px;height:10px;fill:white;" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span style="color:white;font-size:9px;font-weight:800;font-family:'JetBrains Mono',monospace;">U22995</span><span class="ft-dot" style="margin-left:auto;"></span></div>
+      </div>
+    </div>
+    <div class="flight-bar">
+      <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+      <span class="fl-num">U22995</span>
+      <div style="margin-left:auto;text-align:right;"><div class="fl-plan">Geplant: 16:00</div><div class="fl-live"><span class="ft-dot"></span>Live: 17:45</div></div>
+    </div>
+    <div class="card" id="cost-card">
+      <div class="card-hd">Kostenübersicht</div>
+      <div class="card-bd">
+        <div class="cost-row"><span>Parken · 6 Tage</span><span>47,00 €</span></div>
+        <div class="cost-row"><span>Gesamt</span><span style="font-weight:700;color:var(--tx);">47,00 €</span></div>
+        <div class="cost-row"><span>Bezahlt</span><span style="color:var(--rd);font-weight:700;">0,00 €</span></div>
+        <div class="cost-due"><span>Gesamtbetrag fällig</span><span>47,00 €</span></div>
+      </div>
+    </div>
+    <div class="pay-btns">
+      <button class="pay-btn pay-primary" onclick="openSheet('pay-sheet')">💳 Markieren als bezahlt</button>
+      <button class="pay-btn pay-sec" style="max-width:44px;" onclick="openSheet('pay-sheet')">✉️</button>
+    </div>
+    <div class="shuttle-bar">
+      <svg style="width:14px;height:14px;fill:rgba(255,255,255,0.5);" viewBox="0 0 24 24"><path d="M17 13H7v-2h10v2zm2-8H5c-1.1 0-2 .9-2 2v3h2V7c0-1.1-.9-2-2-2zm0 8h2v3c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2v-3h2v3h14v-3z"/></svg>
+      <div><div class="shuttle-sub">Shuttle</div><div class="shuttle-txt">ParkKing – ParkingList</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:5px;"><div class="shuttle-dot" style="background:#9333EA;"></div><span style="color:white;font-size:10px;font-weight:700;">Biemann</span></div>
+    </div>
+
+    <!-- PROTOKOLL -->
+    <div class="card" style="margin-bottom:8px;">
+      <div class="card-hd" style="display:flex;align-items:center;gap:6px;">
+        <svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5V2.05z"/></svg>
+        Protokoll
+      </div>
+      <div class="card-bd" style="padding:6px 11px;">
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--bdr);align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gr2);border:2px solid var(--gr);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+              <svg style="width:12px;height:12px;fill:var(--gr);" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:700;color:var(--tx);">Eingecheckt</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:1px;">Sayed Tamim Sadat</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:var(--t2);font-family:'JetBrains Mono',monospace;flex-shrink:0;">14:32</div>
+          </div>
+          <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--bdr);align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--or2);border:2px solid var(--or);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+              <svg style="width:12px;height:12px;fill:var(--or);" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:700;color:var(--tx);">Änderung</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:1px;">Mohammad Salehbeigi</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:var(--t2);font-family:'JetBrains Mono',monospace;flex-shrink:0;">18:32</div>
+          </div>
+          <div style="display:flex;gap:10px;padding:7px 0;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--rd2);border:2px solid var(--rd);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+              <svg style="width:12px;height:12px;fill:var(--rd);" viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:700;color:var(--tx);">Ausgecheckt</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:1px;">Donald Trump</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:var(--t2);font-family:'JetBrains Mono',monospace;flex-shrink:0;">21:39</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PHOTO CI ══ -->
+<div class="screen" id="s-photo-ci">
+  <div class="sb dk"><span class="sb-t">02:06</span></div>
+  <div style="background:var(--b5);padding:7px 14px 11px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Zurück</button>
+    <span style="color:white;font-size:13px;font-weight:700;">Fahrzeugfotos · Check-in</span>
+    <div style="width:28px;"></div>
+  </div>
+  <div style="background:var(--b1);padding:6px 11px;font-size:10px;color:var(--b6);font-weight:600;flex-shrink:0;">Wähle einen Bereich und fotografiere</div>
+  <div class="photo-grid-big">
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Vorne Links</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Vorne Rechts</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Hinten Links</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Hinten Rechts</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg><span>Innenraum</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg><span>Tachostand</span></div>
+  </div>
+  <div style="padding:0 10px 7px;"><button class="skip-btn" onclick="go('s-km')">Überspringen →</button></div>
+  <div style="padding:0 10px 12px;"><button onclick="go('s-km')" style="width:100%;padding:11px;background:var(--b5);color:white;border:none;border-radius:9px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Weiter → KM & Unterschrift</button></div>
+</div>
+
+<!-- ══ PHOTO CO ══ -->
+<div class="screen" id="s-photo-co">
+  <div class="sb dk"><span class="sb-t">02:06</span></div>
+  <div style="background:var(--rd);padding:7px 14px 11px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Zurück</button>
+    <span style="color:white;font-size:13px;font-weight:700;">Fahrzeugfotos · Check-out</span>
+    <div style="width:28px;"></div>
+  </div>
+  <div style="background:#FEE2E2;padding:6px 11px;font-size:10px;color:var(--rd);font-weight:600;flex-shrink:0;">Fahrzeug bei Rückgabe dokumentieren</div>
+  <div class="photo-grid-big">
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Vorne Links</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Vorne Rechts</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Hinten Links</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0115.2 12 3.2 3.2 0 0112 8.8 3.2 3.2 0 018.8 12 3.2 3.2 0 0112 15.2m0-8a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5m0-1H8l-1.48-1.6H6a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-.8L15.68 4.4A1 1 0 0015 4H9a1 1 0 00-.72.4L6.8 6H6a2 2 0 00-2 2z"/></svg><span>Hinten Rechts</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg><span>Innenraum</span></div>
+    <div class="pg-cell" onclick="togglePhoto(this)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg><span>Tachostand</span></div>
+  </div>
+  <div style="padding:0 10px 7px;"><button class="skip-btn" onclick="go('s-km')">Überspringen →</button></div>
+  <div style="padding:0 10px 12px;"><button onclick="go('s-km')" style="width:100%;padding:11px;background:var(--rd);color:white;border:none;border-radius:9px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Weiter → KM & Unterschrift</button></div>
+</div>
+
+<!-- ══ KM SCREEN ══ -->
+<div class="screen" id="s-km">
+  <div class="sb dk"><span class="sb-t">02:06</span></div>
+  <div style="background:white;padding:7px 14px 9px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--bdr);">
+    <button style="background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;color:var(--b5);font-size:12px;font-weight:600;" onclick="goBack()"><svg style="width:14px;height:14px;fill:var(--b5);" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Zurück</button>
+    <span style="font-size:13px;font-weight:700;color:var(--tx);">Buchung</span>
+    <div style="width:28px;"></div>
+  </div>
+  <div class="scroll" style="padding:9px;">
+    <div class="form-section">
+      <div class="form-sec-hd">Check-in Einzelheiten</div>
+      <div class="form-row"><span class="form-lbl">Kilometerstand</span><input class="form-inp mono" type="number" placeholder="0"></div>
+      <div class="form-row"><span class="form-lbl">Schlüsselcode</span><input class="form-inp" type="text" placeholder="—"></div>
+      <div class="form-row"><span class="form-lbl">Ankunftsflugnummer</span><input class="form-inp mono" type="text" value="EW7547"></div>
+      <div class="form-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <span class="form-lbl" style="font-weight:700;color:var(--tx);">🔑 Schlüssel</span>
+        <div style="display:flex;gap:8px;width:100%;">
+          <button id="ci-key-no" onclick="setCiKey('no')" style="flex:1;padding:10px 6px;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--rd);background:var(--rd2);color:var(--rd);">🔑 Schlüssellos</button>
+          <button id="ci-key-yes" onclick="setCiKey('yes')" style="flex:1;padding:10px 6px;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);">✓ Schlüssel abgegeben</button>
+        </div>
+      </div>
+      <div class="check-row" onclick="toggleCheck(this)">
+        <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+        <span style="font-size:12px;color:var(--tx);">Fotos bei schlechter Sicht aufgenommen</span>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-sec-hd">Bemerkungen</div>
+      <div style="padding:9px 11px;"><textarea style="width:100%;border:none;outline:none;font-family:inherit;font-size:12px;color:var(--tx);background:transparent;resize:none;min-height:54px;" placeholder="Neuen Kommentar eingeben…"></textarea></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:var(--t2);margin-bottom:6px;">Unterschrift des Kunden</div>
+    <div class="sig-box"><span>Hier unterschreiben…</span></div>
+    <div style="height:12px;"></div>
+    <button onclick="showSuccess('checkin')" style="width:100%;padding:11px;background:var(--b5);color:white;border:none;border-radius:9px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(30,78,216,0.22);">Sichern</button>
+    <div style="height:18px;"></div>
+  </div>
+</div>
+
+<!-- ══ NEU BUCHUNG ══ -->
+<div class="screen" id="s-checkin">
+  <div class="sb dk"><span class="sb-t">02:06</span></div>
+  <div style="background:var(--b5);padding:7px 14px 11px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+    <button class="back-btn" onclick="go('s-list')"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Zurück</button>
+    <span style="color:white;font-size:13px;font-weight:700;">Neue Buchung</span>
+    <div style="width:28px;"></div>
+  </div>
+  <div class="scroll" style="padding:9px;">
+    <div class="form-section">
+      <div class="form-sec-hd">Kundendaten</div>
+      <div class="form-row"><span class="form-lbl">Name</span><input class="form-inp" type="text" placeholder="Vor- und Nachname"></div>
+      <div class="form-row"><span class="form-lbl">Telefon</span><input class="form-inp" type="tel" placeholder="+49…"></div>
+      <div class="form-row"><span class="form-lbl">E-Mail</span><input class="form-inp" type="email" placeholder="email@…"></div>
+      <div class="form-row"><span class="form-lbl">Personen</span><input class="form-inp" type="number" placeholder="1" style="max-width:60px;"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-sec-hd">Fahrzeug</div>
+      <div class="form-row"><span class="form-lbl">Kennzeichen</span><input class="form-inp mono" type="text" placeholder="HH-AB 123"></div>
+      <div class="form-row"><span class="form-lbl">Automarke</span><input class="form-inp" type="text" placeholder="BMW, VW…"></div>
+      <div class="form-row"><span class="form-lbl">Schlüsselcode</span><input class="form-inp" type="text" placeholder="—"></div>
+      <div class="form-row" style="justify-content:space-between;flex-wrap:wrap;gap:6px;">
+        <span class="form-lbl">Schlüssel</span>
+        <div style="display:flex;gap:6px;">
+          <button id="key-btn-no" onclick="setKeyStatus('no')" style="padding:6px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--rd);background:var(--rd2);color:var(--rd);">🔑 Schlüssellos</button>
+          <button id="key-btn-yes" onclick="setKeyStatus('yes')" style="padding:6px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);">✓ Abgegeben</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-sec-hd">Zeitraum & Flug</div>
+      <div class="form-row"><span class="form-lbl">Annahme</span><input class="form-inp" type="datetime-local"></div>
+      <div class="form-row"><span class="form-lbl">Rückgabe</span><input class="form-inp" type="datetime-local"></div>
+      <div class="form-row"><span class="form-lbl">Flug Hin</span><input class="form-inp mono" type="text" placeholder="LH1234"></div>
+      <div class="form-row"><span class="form-lbl">Flug Rück</span><input class="form-inp mono" type="text" placeholder="LH5678"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-sec-hd">Preis & Zahlung</div>
+      <div class="form-row">
+        <span class="form-lbl">Preis</span>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <input class="form-inp mono" type="number" placeholder="0,00" style="max-width:80px;text-align:right;" id="new-price-inp">
+          <span style="font-size:13px;font-weight:700;color:var(--t2);">€</span>
+        </div>
+      </div>
+      <div class="form-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <span class="form-lbl">Zahlungsstatus</span>
+        <div style="display:flex;gap:7px;width:100%;">
+          <button id="pay-status-unpaid" onclick="setNewPayStatus('unpaid')" style="flex:1;padding:8px 6px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--rd);background:var(--rd2);color:var(--rd);">✗ Offen</button>
+          <button id="pay-status-paid" onclick="setNewPayStatus('paid')" style="flex:1;padding:8px 6px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);">✓ Bezahlt</button>
+        </div>
+      </div>
+      <div id="pay-method-row" style="display:none;flex-direction:column;align-items:flex-start;gap:8px;padding:9px 11px;border-top:1px solid var(--bdr);">
+        <span class="form-lbl">Zahlungsart</span>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button class="pay-method-btn on" onclick="setPayMethod(this,'Cash')">💵 Cash</button>
+          <button class="pay-method-btn" onclick="setPayMethod(this,'PIN')">💳 PIN</button>
+          <button class="pay-method-btn" onclick="setPayMethod(this,'Via Partner')">🤝 Partner</button>
+          <button class="pay-method-btn" onclick="setPayMethod(this,'Overig')">• Sonstige</button>
+        </div>
+      </div>
+    </div>
+    <button onclick="createBooking()" style="width:100%;padding:13px;background:var(--b5);color:white;border:none;border-radius:9px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 3px 10px rgba(30,78,216,0.22);letter-spacing:-.2px;">Buchung erstellen</button>
+    <div style="height:18px;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: CHAT LISTE
+══════════════════════════════════════ -->
+<div class="screen" id="s-chat-list">
+  <div class="sb dk"><span class="sb-t">02:05</span></div>
+  <div class="chat-hd">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <button class="back-btn" onclick="go('s-list')"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Zurück</button>
+      <span style="color:white;font-size:14px;font-weight:700;">Fahrer-Chat</span>
+      <div style="width:28px;"></div>
+    </div>
+    <div class="stat-strip">
+      <div class="stp"><div class="stp-n ac">8</div><div class="stp-l">Online</div></div>
+      <div class="stp"><div class="stp-n rd">3</div><div class="stp-l">Ungelesen</div></div>
+      <div class="stp"><div class="stp-n gr">5</div><div class="stp-l">Fahrer</div></div>
+    </div>
+  </div>
+  <div style="background:#E8EFFE;padding:7px 12px;font-size:10px;color:var(--b6);font-weight:600;flex-shrink:0;">🔒 Interner Kanal · Nur für Park King Mitarbeiter</div>
+  <div class="scroll" style="background:white;">
+    <div class="chat-list">
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#10B981,#059669);">KL</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Klaus Biemann</span><span class="chat-time">02:01</span></div>
+          <div class="chat-last">Bin jetzt bei Platz 34 – Auto steht bereit</div>
+        </div>
+        <div class="chat-unread">2</div>
+      </div>
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);">AH</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Ahmed Al-Rashid</span><span class="chat-time">01:44</span></div>
+          <div class="chat-last">LRO HM 85 – Kunde wartet am Terminal 2</div>
+        </div>
+        <div class="chat-unread">1</div>
+      </div>
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706);">MH</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Maria Hoffmann</span><span class="chat-time">01:30</span></div>
+          <div class="chat-last">Shuttle Fahrt 3 abgeschlossen ✓</div>
+        </div>
+      </div>
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);">SL</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Sarah Lisch</span><span class="chat-time">00:55</span></div>
+          <div class="chat-last">Shift beginnt gleich, bin in 5 min da</div>
+        </div>
+      </div>
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626);">TW</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Thomas Weber</span><span class="chat-time">Gestern</span></div>
+          <div class="chat-last">Parkplatz A3 ist vollständig belegt</div>
+        </div>
+      </div>
+      <!-- GROUP -->
+      <div style="background:var(--b0);padding:7px 12px;font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;">Gruppen</div>
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,var(--b5),var(--b4));font-size:18px;">📢</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Alle Fahrer</span><span class="chat-time">02:00</span></div>
+          <div class="chat-last">MPR: Achtung – Terminal 2 Einfahrt gesperrt</div>
+        </div>
+      </div>
+      <div class="chat-item" onclick="go('s-chat-conv')">
+        <div class="chat-avatar" style="background:linear-gradient(135deg,#10B981,#059669);font-size:18px;">🌙</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span class="chat-name">Nachtschicht</span><span class="chat-time">01:15</span></div>
+          <div class="chat-last">Nächste Abholung: 03:30 Uhr – Louis Evert</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <button class="tab" onclick="go('s-list')"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg><span>Buchungen</span></button>
+    <button class="tab" onclick="go('s-checkin')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Neu</span></button>
+    <button class="tab on"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg><span>Chat</span></button>
+    <button class="tab" onclick="go('s-employees')"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Mitarbeiter</span></button>
+  </div>
+</div>
+
+<!-- ══ CHAT CONVERSATION ══ -->
+<div class="screen" id="s-chat-conv">
+  <div class="sb dk"><span class="sb-t">02:05</span></div>
+  <div class="chat-conv-hd">
+    <button style="background:none;border:none;cursor:pointer;" onclick="go('s-chat-list')"><svg style="width:18px;height:18px;fill:var(--b5);" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="chat-avatar" style="background:linear-gradient(135deg,#10B981,#059669);width:32px;height:32px;border-radius:9px;font-size:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;">KL</div>
+    <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--tx);">Klaus Biemann</div><div style="font-size:10px;color:var(--gr);">● Online</div></div>
+  </div>
+  <div class="chat-msgs">
+    <div class="msg them"><div class="msg-bubble">Bin jetzt bei Platz 34 – Auto steht bereit 👍</div><div class="msg-time">02:01</div></div>
+    <div class="msg them"><div class="msg-bubble">LRO HM 85 kann jetzt abgeholt werden</div><div class="msg-time">02:01</div></div>
+    <div class="msg me"><div class="msg-bubble">Super danke! Kunde ist schon unterwegs</div><div class="msg-time">02:03</div></div>
+    <div class="msg them"><div class="msg-bubble">Wann kommt die nächste Gruppe an? Brauche kurze Pause</div><div class="msg-time">02:04</div></div>
+    <div class="msg me"><div class="msg-bubble">Nächste Ankunft 03:30 – du hast noch 1.5h Zeit</div><div class="msg-time">02:05</div></div>
+  </div>
+  <div class="chat-input-bar">
+    <input class="chat-inp" type="text" placeholder="Nachricht…">
+    <button class="chat-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+  </div>
+</div>
+
+<!-- ══ EMPLOYEES ══ -->
+<div class="screen" id="s-employees">
+  <div class="sb dk"><span class="sb-t" id="emp-clock">02:05</span></div>
+  <div style="background:linear-gradient(150deg,var(--b9),var(--b7));padding:8px 14px 16px;flex-shrink:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="color:white;font-size:16px;font-weight:800;">Mitarbeiterplan</div>
+      <!-- WEEK NAVIGATION -->
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button onclick="empChangeWeek(-1)" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.12);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+        </button>
+        <div style="text-align:center;">
+          <div id="emp-week-label" style="color:white;font-size:11px;font-weight:700;white-space:nowrap;">Diese Woche</div>
+          <div id="emp-week-range" style="color:rgba(255,255,255,0.5);font-size:9px;white-space:nowrap;">3 – 9 März</div>
+        </div>
+        <button onclick="empChangeWeek(1)" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.12);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <svg style="width:14px;height:14px;fill:white;" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        </button>
+        <button onclick="empGoToday()" id="emp-today-btn" style="display:none;padding:4px 9px;border-radius:7px;background:var(--ac);border:none;cursor:pointer;font-family:Inter,sans-serif;font-size:9px;font-weight:700;color:#0A0F2C;">Heute</button>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="stp" style="position:relative;overflow:hidden;">
+        <div class="stp-n ac" id="emp-worked-h">62</div>
+        <div class="stp-l">Std. gearbeitet</div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.1);border-radius:0 0 9px 9px;">
+          <div style="height:100%;width:34%;background:var(--ac);border-radius:0 0 9px 9px;"></div>
+        </div>
+      </div>
+      <div class="stp" style="position:relative;overflow:hidden;">
+        <div class="stp-n" style="color:#E2E8FF;" id="emp-target-h">180</div>
+        <div class="stp-l">Std. Ziel / Monat</div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.1);border-radius:0 0 9px 9px;"></div>
+      </div>
+      <div class="stp">
+        <div style="display:flex;align-items:center;justify-content:center;gap:3px;">
+          <div class="stp-n or" id="emp-rating-val">8.4</div>
+          <div style="color:#FBBF24;font-size:11px;line-height:1;margin-top:2px;">★</div>
+        </div>
+        <div class="stp-l">Bewertung</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll" style="padding:8px 0 14px;">
+
+    <!-- MY CHECK-IN CARD -->
+    <div id="emp-ci-card" style="margin:0 8px 10px;background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 8px rgba(10,15,44,0.07);border:1px solid var(--bdr);">
+      <div style="padding:10px 13px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--tx);">Mohammad Pervez Rana</div>
+          <div style="font-size:10px;color:var(--b5);font-weight:700;">● Du · Frühschicht</div>
+        </div>
+        <div id="emp-status-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FEF2F2;color:#EF4444;border:1px solid #FECACA;">Nicht eingecheckt</div>
+      </div>
+
+      <!-- TIMER -->
+      <div id="emp-timer-row" style="display:none;padding:10px 13px;border-bottom:1px solid var(--bdr);background:var(--gr2);align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--gr);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg style="width:18px;height:18px;fill:white;" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--gr);font-weight:700;">Arbeitszeit läuft</div>
+          <div id="emp-timer-display" style="font-size:20px;font-weight:900;color:var(--tx);font-family:'JetBrains Mono',monospace;line-height:1.2;">00:00:00</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:9px;color:var(--t3);">Eingecheckt um</div>
+          <div id="emp-checkin-time" style="font-size:12px;font-weight:700;color:var(--tx);font-family:'JetBrains Mono',monospace;">--:--</div>
+        </div>
+      </div>
+
+      <!-- GPS STATUS -->
+      <div id="emp-gps-row" style="padding:8px 13px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:7px;">
+        <svg id="emp-gps-icon" style="width:13px;height:13px;fill:var(--t3);flex-shrink:0;" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div id="emp-gps-text" style="font-size:10px;color:var(--t3);font-weight:600;">GPS wird ermittelt…</div>
+      </div>
+
+      <!-- BUTTONS -->
+      <div style="padding:10px 13px;display:flex;gap:8px;">
+        <button id="emp-btn-in" onclick="empCheckIn()" style="flex:1;padding:11px;background:var(--gr);color:white;border:none;border-radius:9px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✓ Einchecken</button>
+        <button id="emp-btn-out" onclick="empCheckOut()" style="flex:1;padding:11px;background:#EF4444;color:white;border:none;border-radius:9px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:none;">⇥ Auschecken</button>
+      </div>
+    </div>
+
+    <div class="shift-card">
+      <div class="shift-hd"><div class="shift-dot" style="background:#3B82F6;"></div><div><div class="shift-title">Frühschicht</div><div class="shift-time">03:00 – 12:00 Uhr</div></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Mohammad Pervez Rana','03:00','10:45','7','3')"><div><div class="shift-name">Mohammad Pervez Rana</div><div style="font-size:9px;color:var(--b5);font-weight:700;">● Du</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--b1);color:var(--b5);">03:00–12:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Ahmed Al-Rashid','03:00','12:00','5','2')"><div><div class="shift-name">Ahmed Al-Rashid</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--b1);color:var(--b5);">03:00–12:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Maria Hoffmann','06:00','12:00','3','2')"><div><div class="shift-name">Maria Hoffmann</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--b1);color:var(--b5);">06:00–12:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+    </div>
+    <div class="shift-card">
+      <div class="shift-hd"><div class="shift-dot" style="background:#10B981;"></div><div><div class="shift-title">Mittelschicht</div><div class="shift-time">12:00 – 18:00 Uhr</div></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Klaus Biemann','12:00','18:00','4','3')"><div><div class="shift-name">Klaus Biemann</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--gr2);color:var(--gr);">12:00–18:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Sarah Lisch','12:00','18:00','3','1')"><div><div class="shift-name">Sarah Lisch</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--gr2);color:var(--gr);">12:00–18:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Thomas Weber','14:00','18:00','2','1')"><div><div class="shift-name">Thomas Weber</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--gr2);color:var(--gr);">14:00–18:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+    </div>
+    <div class="shift-card">
+      <div class="shift-hd"><div class="shift-dot" style="background:#F59E0B;"></div><div><div class="shift-title">Spätschicht</div><div class="shift-time">18:00 – 00:00 Uhr</div></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Petra Schneider','18:00','00:00','6','4')"><div><div class="shift-name">Petra Schneider</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--or2);color:var(--or);">18:00–00:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+      <div class="shift-emp" style="cursor:pointer;" onclick="showShiftLog('Felix Hartmann','20:00','00:00','3','2')"><div><div class="shift-name">Felix Hartmann</div><div class="shift-time">Fahrer</div></div><div style="display:flex;align-items:center;gap:5px;"><span class="shift-badge" style="background:var(--or2);color:var(--or);">20:00–00:00</span><svg style="width:12px;height:12px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <button class="tab" onclick="go('s-list')"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg><span>Buchungen</span></button>
+    <button class="tab" onclick="go('s-checkin')"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Neu</span></button>
+    <button class="tab" onclick="go('s-chat-list')"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg><span>Chat</span></button>
+    <button class="tab on"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Mitarbeiter</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════ OVERLAYS ══════════════════ -->
+
+<!-- MENU -->
+<div id="menu" style="position:absolute;inset:0;z-index:200;background:linear-gradient(150deg,var(--b9),var(--b8));display:none;flex-direction:column;transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);">
+  <div style="background:var(--b9);padding:12px 22px 6px;display:flex;justify-content:space-between;"><span style="color:white;font-size:15px;font-weight:700;">02:05</span></div>
+  <button style="background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;padding:11px 16px 5px;" onclick="closeMenu()"><svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Schliessen</button>
+  <div style="font-size:32px;font-weight:800;color:white;padding:6px 18px 14px;letter-spacing:-1px;">Menü</div>
+  <div style="height:1px;background:rgba(255,255,255,0.07);margin:0 14px;"></div>
+  <button style="display:flex;align-items:center;gap:11px;padding:12px 18px;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:white;width:100%;" onclick="closeMenu();go('s-list')"><div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--b5),var(--b4));display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:16px;height:16px;fill:white;" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></div>Buchungen</button>
+  <div style="height:1px;background:rgba(255,255,255,0.07);margin:0 14px;"></div>
+  <button style="display:flex;align-items:center;gap:11px;padding:12px 18px;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:white;width:100%;" onclick="closeMenu();go('s-chat-list')"><div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:16px;height:16px;fill:white;" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg></div>Fahrer-Chat</button>
+  <div style="height:1px;background:rgba(255,255,255,0.07);margin:0 14px;"></div>
+  <button style="display:flex;align-items:center;gap:11px;padding:12px 18px;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:white;width:100%;" onclick="closeMenu();go('s-checkin')"><div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#7C3AED,#6D28D9);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:16px;height:16px;fill:white;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>Neue Buchungen</button>
+  <div style="height:1px;background:rgba(255,255,255,0.07);margin:0 14px;"></div>
+  <button style="display:flex;align-items:center;gap:11px;padding:12px 18px;cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:white;width:100%;" onclick="closeMenu();go('s-employees')"><div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--or),#D97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:16px;height:16px;fill:white;" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>Mitarbeiterplan</button>
+  <div style="margin-top:auto;padding:14px 18px;color:rgba(255,255,255,0.2);font-size:9px;">Park King · Version 5.0.0</div>
+</div>
+
+<!-- FILTER SHEET -->
+<div class="overlay" id="filter-overlay" onclick="if(event.target===this)closeFilterSheet()">
+  <div class="filter-sheet-inner">
+    <div class="fs-hd">
+      <button class="fs-close" onclick="closeFilterSheet()">Schliessen</button>
+      <span style="font-size:14px;font-weight:800;color:var(--tx);">Filter</span>
+      <button class="fs-save" onclick="closeFilterSheet()">Sichern</button>
+    </div>
+    <div class="fs-scroll">
+      <div class="fs-section">Datum</div>
+      <div class="fs-date-row"><span class="fs-date-lbl">Buchungen anzeigen für</span><span class="fs-date-val">Sa. 28 Feb. 2026</span></div>
+      <button class="fs-today"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>Heute auswählen</button>
+
+      <div class="fs-section">Buchungen anzeigen</div>
+      <div class="toggle-row"><span class="toggle-lbl">Checked-in/out Buchungen</span><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="toggle-row"><span class="toggle-lbl">Stornierte Buchungen</span><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="toggle-row"><span class="toggle-lbl">No-shows</span><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="toggle-row"><span class="toggle-lbl">Flughäfen filtern</span><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="toggle-row"><span class="toggle-lbl">Produktstandorte filtern</span><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="toggle-row" style="border-bottom:none;"><span class="toggle-lbl">Platzierungsorte filtern</span><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+
+      <div class="fs-section" style="margin-top:16px;">Anzeigeoptionen</div>
+      <div class="toggle-row" style="border-bottom:none;"><span class="toggle-lbl">Live Flugzeiten</span><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+
+      <div class="fs-section" style="margin-top:16px;">Art der Buchungen</div>
+      <div class="type-btns">
+        <button class="type-btn on" onclick="setTypeBtn(this)">✓ Alles</button>
+        <button class="type-btn" onclick="setTypeBtn(this)">Eingehend</button>
+        <button class="type-btn" onclick="setTypeBtn(this)">Ausfahrend</button>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PHONE SHEET -->
+<div class="overlay" id="phone-sheet" onclick="if(event.target===this)closeSheet('phone-sheet')">
+  <div class="sheet">
+    <div class="s-handle"></div>
+    <div class="s-title" id="phone-sheet-title">Status aktualisieren</div>
+    <button class="s-item" onclick="closeSheet('phone-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,var(--gr),#059669);"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>
+      <div><div class="s-lbl">Gelandet &amp; angerufen</div><div class="s-sub">Kunde gelandet und kontaktiert</div></div>
+    </button>
+    <div style="height:1px;background:var(--bdr);margin:0 14px;"></div>
+    <button class="s-item" onclick="closeSheet('phone-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,var(--b5),var(--b4));"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div>
+      <div><div class="s-lbl">Koffer erhalten &amp; Abholbereit</div><div class="s-sub">Gepäck abgeholt – Fahrzeug bereit</div></div>
+    </button>
+    <button class="s-cancel" onclick="closeSheet('phone-sheet')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- PAY SHEET -->
+<div class="overlay" id="pay-sheet" onclick="if(event.target===this)closeSheet('pay-sheet')">
+  <div class="sheet">
+    <div class="s-handle"></div>
+    <div class="s-title">Zahlungsmethode</div>
+    <button class="s-item" onclick="markPaid('Cash');closeSheet('pay-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,#10B981,#059669);"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+      <span class="s-lbl">Cash</span>
+    </button>
+    <button class="s-item" onclick="markPaid('Via Partner');closeSheet('pay-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,var(--b5),var(--b4));"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+      <span class="s-lbl">Via Partner</span>
+    </button>
+    <button class="s-item" onclick="markPaid('Overig');closeSheet('pay-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,#F59E0B,#D97706);"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+      <span class="s-lbl">Overig</span>
+    </button>
+    <button class="s-item" onclick="markPaid('PIN');closeSheet('pay-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,#6366F1,#4F46E5);"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+      <span class="s-lbl">PIN</span>
+    </button>
+    <button class="s-cancel" onclick="closeSheet('pay-sheet')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- SETTINGS SHEET -->
+<div class="overlay" id="sett-sheet" onclick="if(event.target===this)closeSheet('sett-sheet')">
+  <div class="sheet">
+    <div class="s-handle"></div>
+    <div class="s-title">Buchungsoptionen</div>
+    <button class="s-item" onclick="openEditSheet();closeSheet('sett-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,var(--b5),var(--b4));"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+      <div><div class="s-lbl">Buchung ändern</div><div class="s-sub">Name, Datum, KFZ, Personen…</div></div>
+    </button>
+    <button class="s-item" onclick="doNoShow();closeSheet('sett-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,#6B7280,#4B5563);"><svg viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27z"/></svg></div>
+      <div><div class="s-lbl">No Show</div><div class="s-sub">Buchung als nicht erschienen markieren</div></div>
+    </button>
+    <button class="s-item" onclick="openLabelPreview();closeSheet('sett-sheet')">
+      <div class="s-icon" style="background:linear-gradient(135deg,#F59E0B,#D97706);"><svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg></div>
+      <div><div class="s-lbl">Label drucken</div><div class="s-sub">Bluetooth-Labeldrucker</div></div>
+    </button>
+    <button class="s-cancel" onclick="closeSheet('sett-sheet')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- EDIT SHEET -->
+<div class="overlay" id="edit-overlay" style="align-items:flex-end;display:none;" onclick="if(event.target===this)closeEditSheet()">
+  <div style="width:100%;background:white;border-radius:22px 22px 0 0;max-height:85vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);" id="edit-inner">
+    <div style="padding:12px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <span style="font-size:14px;font-weight:800;color:var(--tx);">Buchung ändern</span>
+      <button style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--b5);" onclick="closeEditSheet()">Abbrechen</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:10px;scrollbar-width:none;">
+      <div class="form-section"><div class="form-sec-hd">Kundendaten</div>
+        <div class="form-row"><span class="form-lbl">Name</span><input class="form-inp" value="Horst Pust"></div>
+        <div class="form-row"><span class="form-lbl">Handynummer</span><input class="form-inp" type="tel" value="015733910609"></div>
+        <div class="form-row"><span class="form-lbl">E-Mail</span><input class="form-inp" type="email" value="horstpust@t-online.de"></div>
+        <div class="form-row"><span class="form-lbl">Personanzahl</span><input class="form-inp" type="number" value="2" style="max-width:50px;"></div>
+      </div>
+      <div class="form-section"><div class="form-sec-hd">Fahrzeug</div>
+        <div class="form-row"><span class="form-lbl">Kennzeichen</span><input class="form-inp mono" value="LRO HM 85"></div>
+        <div class="form-row"><span class="form-lbl">Automarke</span><input class="form-inp" placeholder="—"></div>
+        <div class="form-row"><span class="form-lbl">Schlüsselcode</span><input class="form-inp" value="QR 91"></div>
+      </div>
+      <div class="form-section"><div class="form-sec-hd">Zeitraum</div>
+        <div class="form-row"><span class="form-lbl">Hinreise</span><input class="form-inp" type="datetime-local" value="2026-03-04T12:00"></div>
+        <div class="form-row"><span class="form-lbl">Rückkehr</span><input class="form-inp" type="datetime-local" value="2026-03-09T16:00"></div>
+      </div>
+    </div>
+    <div style="padding:10px 10px 14px;flex-shrink:0;"><button onclick="closeEditSheet()" style="width:100%;padding:11px;background:var(--b5);color:white;border:none;border-radius:9px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Änderungen speichern</button></div>
+  </div>
+</div>
+
+<!-- LABEL PREVIEW -->
+<div id="label-preview" onclick="if(event.target===this)closeLabelPreview()">
+  <div class="label-card">
+    <div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">
+      <svg style="width:11px;height:11px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      Label-Vorschau · Bluetooth
+    </div>
+    <!-- 50x30mm = 5:3 ratio — at screen: 312x187px -->
+    <div style="width:312px;height:187px;border:2px dashed #C4CAD4;border-radius:5px;background:#FAFAFA;padding:10px 14px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
+      <!-- top: date + time — BOTH huge and bold -->
+      <div>
+        <div style="font-size:7px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px;">Rückkehr</div>
+        <div id="lbl-date" style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:900;color:var(--tx);line-height:1.05;letter-spacing:-.5px;"></div>
+        <div id="lbl-time" style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:900;color:var(--b5);line-height:1.05;letter-spacing:-.5px;"></div>
+      </div>
+      <!-- divider -->
+      <div style="border-top:1px dashed #D1D5DB;"></div>
+      <!-- bottom: name, plate, car, printed by -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <div>
+          <div id="lbl-name" style="font-size:11px;font-weight:800;color:var(--tx);line-height:1.3;"></div>
+          <div id="lbl-plate" style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--tx);line-height:1.3;"></div>
+          <div id="lbl-car" style="font-size:9px;color:var(--t2);line-height:1.3;"></div>
+        </div>
+        <div style="font-size:7px;color:var(--t3);text-align:right;max-width:90px;line-height:1.4;">
+          <svg style="width:8px;height:8px;fill:var(--t3);" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><br>
+          Gedruckt:<br><span id="lbl-user" style="font-weight:700;">Mohammad Pervez Rana</span>
+        </div>
+      </div>
+    </div>
+    <div class="label-btns">
+      <button class="label-btn" style="background:var(--b5);color:white;" onclick="doPrint()">🖨️ Drucken</button>
+      <button class="label-btn" style="background:var(--b0);color:var(--t2);" onclick="closeLabelPreview()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="success"><div class="s-ring"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="s-t" id="s-t2">Check-in erfolgreich!</div><div class="s-s" id="s-s2">Fahrzeug wurde angenommen.</div><button class="s-btn" onclick="hideSuccess()">Zurück zur Liste</button></div>
+
+</div><!-- /phone -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── DATA ───
+const bookings = [
+  {id:'#EMDYUSZ',name:'Louis Evert',plate:'RÜG-F-2309',car:'Mazda',time:'03:30',type:'in',status:'checked',provider:'Park King Shuttle',pax:1,price:0,comment:false,phone:'017012345678'},
+  {id:'#EMHNVSG',name:'Wolfgang Freirath',plate:'SN WF 62',car:'VW',time:'04:00',type:'in',status:'checked',provider:'Park King Shuttle',pax:1,price:0,comment:false,phone:'017023456789'},
+  {id:'#E6HS3SG',name:'Arn Grünberg',plate:'OH YI 33E',car:'Mercedes C Klasse',time:'04:30',type:'in',status:'checked',provider:'Park King',pax:2,price:0,comment:false,phone:'017034567890',wash:'innen_aussen'},
+  {id:'#YQHSVSG',name:'Stefan Lisch',plate:'HH LL 908 E',car:'VW ID.5',time:'06:30',type:'in',status:'checked',provider:'Park King Shuttle',pax:2,price:0,comment:false,phone:'017045678901'},
+  {id:'#YRSH7ZZ',name:'Ingo Massa',plate:'OH IK 1',car:'Mini schlüssellos',time:'07:30',type:'in',status:'pending',provider:'Park King',pax:2,price:0,comment:true,phone:'017056789012',phoneContacted:true},
+  {id:'#E7DYUSG',name:'DANIEL KRISZIO',plate:'LG-PT-1991',car:'Mazda 2',time:'08:30',type:'in',status:'pending',provider:'Park King',pax:2,price:0,comment:false,phone:'017067890123'},
+  {id:'#YRHHVSZ',name:'Franz-Josef Jürgens',plate:'VEC-MJ25',car:'VW',time:'12:00',type:'in',status:'new',provider:'Park King',pax:1,price:0,comment:false,phone:'017078901234'},
+  {id:'#E6BH3SG',name:'Robert Krukowski',plate:'RZ XQ 2253',car:'—',time:'13:30',type:'out',status:'due',provider:'Park King',pax:3,price:47,comment:false,phone:'017089012345',flightCode:'XQ914',flightLive:'15:10',wash:'aussen'},
+  {id:'#EMDYASZ',name:'Andrej Janjic',plate:'ELAM2503',car:'Cupra Formentor',time:'14:00',type:'in',status:'new',provider:'Park King Shuttle',pax:2,price:0,comment:false,phone:'017090123456'},
+  {id:'#YQHSVSZ',name:'Lars Litwin',plate:'LG GO 199',car:'Renault',time:'16:00',type:'out',status:'new',provider:'Park King',pax:1,price:0,comment:true,phone:'017001234567',phoneContacted:true},
+  {id:'#YABXUSC',name:'Smajil Kurtovic',plate:'FL SM-53',car:'—',time:'16:30',type:'out',status:'due',provider:'Park King',pax:2,price:35,comment:false,phone:'017012340000'},
+  {id:'#EMNKUSG',name:'Klaus-Werner Hollien',plate:'SN AH 2310',car:'Mercedes E250',time:'05:00',type:'out',status:'checked',provider:'PD24-Parkos',pax:2,price:0,comment:true,phone:'017023400000'},
+  {id:'#YABFASZ',name:'Wilfried Hirth',plate:'SN-SW 45',car:'Opel Zafira',time:'05:00',type:'out',status:'new',provider:'Park King',pax:1,price:0,comment:false,phone:'017034000000'},
+  {id:'#E3SSZZZ',name:'Horst Pust',plate:'LRO HM 85',car:'—',time:'12:00',type:'out',status:'due',provider:'PK-ParkingList',pax:2,price:47,comment:false,phone:'015733910609',flightCode:'U22995',flightSched:'16:00',flightLive:'17:45',wash:'innen_aussen'},
+  {id:'#YQBEKZG',name:'MR U KNIEP',plate:'KIYC33',car:'AUDI',time:'21:30',type:'out',status:'new',provider:'Park King',pax:2,price:0,comment:false,phone:'017056000000',flightCode:'DE6519'},
+];
+
+let curFilter = 'all';
+
+function provColors(p) {
+  if (p.includes('Shuttle')) return {bg:'#F5F3FF',bc:'#8B5CF6',c:'#6D28D9'};
+  if (p.includes('Parkos')||p.includes('PD24')) return {bg:'#F5F3FF',bc:'#8B5CF6',c:'#6D28D9'};
+  if (p.includes('ParkingList')||p.includes('PK-')) return {bg:'#F5F3FF',bc:'#8B5CF6',c:'#6D28D9'};
+  return {bg:'#EDE9FE',bc:'#7C3AED',c:'#5B21B6'};
+}
+
+function renderList(data) {
+  data = data || bookings;
+  let filtered = data;
+  if (curFilter === 'annahme') filtered = data.filter(b=>b.type==='in');
+  else if (curFilter === 'abgabe') filtered = data.filter(b=>b.type==='out');
+  else if (curFilter === 'tomorrow') filtered = [];
+
+  const c = document.getElementById('list-wrap');
+  // Sort chronologically by time
+  filtered.sort((a,b) => {
+    const aTime = (a.flightLive && a.flightSched && a.flightLive !== a.flightSched) ? a.flightLive : a.time;
+    const bTime = (b.flightLive && b.flightSched && b.flightLive !== b.flightSched) ? b.flightLive : b.time;
+    const [ah,am] = aTime.split(':').map(Number);
+    const [bh,bm] = bTime.split(':').map(Number);
+    return (ah*60+am) - (bh*60+bm);
+  });
+
+  if (!filtered.length) {
+    c.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:28px;margin-bottom:8px;">📅</div><div style="font-size:12px;font-weight:600;">Keine Buchungen</div></div>`;
+    updateStats([]);
+    return;
+  }
+  let html = '';
+  filtered.forEach(b => {
+    const isOut = b.type==='out';
+    const isChecked = b.status==='checked';
+    const isDue = b.status==='due';
+    const isNoShow = b.status==='noshow';
+    const pc = provColors(b.provider);
+
+    // stripe + bg — due keeps same green/red as type (not yellow!)
+    const stripeColor = isOut ? '#DC2626' : '#16A34A';
+    const bgClass = isChecked
+      ? (isOut ? 'bg-due-out' : 'bg-done')
+      : isDue
+        ? (isOut ? 'bg-due-out' : 'bg-due-in')
+        : isOut ? 'bg-out' : 'bg-in';
+    const bdColor = isOut ? 'rgba(220,38,38,0.2)' : 'rgba(22,163,74,0.2)';
+
+    // flight & live ticker
+    let flightHtml = '';
+    const hasDelay = b.flightLive && b.flightSched && b.flightLive !== b.flightSched;
+
+    // brow-l time: if delayed, live time replaces original (big red + blinking dot), original strikethrough below
+    const timeDisplay = hasDelay
+      ? `<div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+           <svg style="width:11px;height:11px;fill:#DC2626;animation:pulse 1s infinite;" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+           <span class="brow-time" style="color:#DC2626;">${b.flightLive}</span>
+           <div style="font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;text-decoration:line-through;line-height:1;">${b.time}</div>
+         </div>`
+      : `<div class="brow-time">${b.time}</div>`;
+
+    if (hasDelay) {
+      flightHtml = `<span style="display:inline-flex;align-items:center;gap:2px;font-size:8px;font-weight:700;color:#DC2626;font-family:'JetBrains Mono',monospace;"><svg style="width:9px;height:9px;fill:#DC2626;animation:pulse 1.2s infinite;" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>${b.flightCode}</span>`;
+    } else if (b.flightCode) {
+      flightHtml = `<span style="font-size:8px;color:var(--t3);font-family:'JetBrains Mono',monospace;">${b.flightCode}</span>`;
+    }
+
+    // price — only show if there IS a price
+    const priceHtml = b.price > 0
+      ? `<span class="price-tag price-due">${b.price},00 €</span>` : '';
+
+    // phone badge
+    const phoneHtml = b.phoneContacted
+      ? `<div class="phone-indicator"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>${isOut ? 'Koffer erhalten &amp; Abholbereit' : 'Angerufen &amp; Gleich vor Ort'}</span></div>` : '';
+
+    // plate + car on same line
+    const carSuffix = b.car && b.car !== '—' ? ` <span style="color:var(--t3);font-weight:500;font-size:11px;font-family:'Inter',sans-serif;">– ${b.car}</span>` : '';
+
+    html += `<div class="brow ${bgClass}${isNoShow?' noshow':''}" style="border-color:${bdColor};">
+      <div class="brow-stripe" style="background:${stripeColor};"></div>
+      <div class="brow-l" onclick="go('s-detail')">${timeDisplay}</div>
+      <div class="brow-m" onclick="go('s-detail')">
+        <div class="row1">
+          <span class="ptag" style="background:${pc.bg};border-color:${pc.bc};color:${pc.c};">${b.provider}</span>
+          ${b.wash ? `<span class="ptag" style="background:#F0FDF4;border-color:#86EFAC;color:#15803D;display:inline-flex;align-items:center;gap:2px;">🫧 ${b.wash==='innen_aussen'?'Innen &amp; Außen':b.wash==='innen'?'Innen':'Außen'}</span>` : ''}
+          ${b.comment?`<div class="comment-dot"></div>`:''}
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:900;color:var(--tx);line-height:1.2;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${b.plate}${carSuffix}</div>
+        <div class="row2">ParkKing: ${b.name}</div>
+        ${phoneHtml ? `<div style="margin-top:2px;">${phoneHtml}</div>` : ''}
+      </div>
+      <div class="brow-r">
+        ${priceHtml}
+        <div class="pax-tag"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>${b.pax}</div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <div style="padding:3px 7px;border-radius:7px;border:1px solid ${b.keyHandedIn ? 'rgba(22,163,74,0.3)' : 'rgba(239,68,68,0.25)'};background:${b.keyHandedIn ? 'var(--gr2)' : 'var(--rd2)'};font-family:Inter,sans-serif;font-size:9px;font-weight:700;color:${b.keyHandedIn ? 'var(--gr)' : 'var(--rd)'};white-space:nowrap;flex-shrink:0;">
+            ${b.keyHandedIn ? '🔑 Abgegeben' : '🔑 Schlüssellos'}
+          </div>
+          <button class="print-btn" onclick="event.stopPropagation();showLabelFromList(${JSON.stringify(b).replace(/"/g,'&quot;')})" title="Label drucken">
+            <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  });
+  c.innerHTML = html + '<div style="height:10px;"></div>';
+  updateStats(filtered);
+}
+
+function updateStats(filtered) {
+  document.getElementById('st0').textContent = filtered.length || bookings.length;
+  const src = filtered.length ? filtered : bookings;
+  document.getElementById('st1').textContent = src.filter(b=>b.type==='in').length;
+  document.getElementById('st2').textContent = src.filter(b=>b.type==='out').length;
+  document.getElementById('st3').textContent = src.filter(b=>b.status==='new'||b.status==='pending').length;
+  // Payment stats
+  const due = src.reduce((s,b)=>s+(b.price||0),0);
+  const paid = src.filter(b=>b.paid).reduce((s,b)=>s+(b.price||0),0);
+  document.getElementById('hdr-total').textContent = src.length;
+  document.getElementById('hdr-due').textContent = due.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('hdr-paid').textContent = paid.toFixed(2).replace('.',',') + ' €';
+}
+
+// ─── PRINT LOG ───
+const printLog = [];
+
+function addPrintLog(b) {
+  printLog.unshift({
+    id: Date.now(),
+    doc: b.plate,
+    name: b.name,
+    time: new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}),
+    status: Math.random() > 0.15 ? 'printing' : 'error' // simulate occasional error
+  });
+  // Update badge on tab
+  const tab = document.getElementById('tab-print');
+  if (tab) tab.textContent = `Druckvorgang (${printLog.length})`;
+}
+
+function renderPrintQueue() {
+  const c = document.getElementById('list-wrap');
+  if (!printLog.length) {
+    c.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:28px;margin-bottom:8px;">🖨️</div><div style="font-size:12px;font-weight:600;color:var(--t2);">Keine Druckvorgänge</div><div style="font-size:10px;margin-top:4px;">Drucke ein Label um es hier zu sehen</div></div>`;
+    return;
+  }
+  c.innerHTML = '<div style="height:4px;"></div>' + printLog.map(j => {
+    const isPrinting = j.status === 'printing';
+    return `<div style="background:white;margin:0 8px 4px;border-radius:10px;padding:10px 12px;border:1px solid ${isPrinting ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)'};display:flex;align-items:center;gap:10px;box-shadow:var(--sh);">
+      <div style="width:34px;height:34px;border-radius:9px;background:${isPrinting ? 'var(--gr2)' : 'var(--rd2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg style="width:17px;height:17px;fill:${isPrinting ? 'var(--gr)' : 'var(--rd)'};" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:800;color:var(--tx);">Dokumentname: <span style="font-family:'JetBrains Mono',monospace;">${j.doc}</span></div>
+        <div style="font-size:10px;color:var(--t2);margin-top:1px;">ParkKing: ${j.name}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;${isPrinting ? 'background:var(--gr2);color:var(--gr);' : 'background:var(--rd2);color:var(--rd);'}">${isPrinting ? '✓ Gedruckt' : '✗ Fehlgeschlagen'}</div>
+        ${!isPrinting ? '<div style="font-size:8px;color:var(--t3);margin-top:2px;">Keine Verbindung</div>' : ''}
+        <div style="font-size:9px;color:var(--t3);margin-top:2px;">${j.time} Uhr</div>
+      </div>
+    </div>`;
+  }).join('') + '<div style="height:10px;"></div>';
+}
+
+function setF(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const hdr = document.getElementById('hdr-txt');
+  if (f==='tomorrow') hdr.textContent='Buchungen am 1. März';
+  else if (f==='annahme') hdr.textContent='Annahmen Heute';
+  else if (f==='abgabe') hdr.textContent='Abgaben Heute';
+  else if (f==='print') { hdr.textContent='Druckvorgänge'; renderPrintQueue(); return; }
+  else hdr.textContent='Offen Buchungen Heute';
+  renderList();
+}
+
+// ─── SEARCH ───
+function openSearch() {
+  go('s-search');
+  setTimeout(()=>{
+    const inp = document.getElementById('search-main-inp');
+    if(inp){inp.value='';inp.focus();}
+    document.getElementById('search-results').innerHTML = `<div class="search-empty"><div>🔍</div><div style="font-size:13px;font-weight:600;color:var(--t2);">Tippe um zu suchen</div><div style="font-size:11px;margin-top:4px;color:var(--t3);">Name · Kennzeichen · Handynummer · Buchungs-ID</div></div>`;
+  }, 200);
+}
+
+function doSearch(q) {
+  const c = document.getElementById('search-results');
+  q = q.toLowerCase().trim();
+  if (!q) {
+    c.innerHTML = `<div class="search-empty"><div>🔍</div><div style="font-size:13px;font-weight:600;color:var(--t2);">Tippe um zu suchen</div></div>`;
+    return;
+  }
+  const results = bookings.filter(b =>
+    b.name.toLowerCase().includes(q) ||
+    b.plate.toLowerCase().includes(q) ||
+    b.id.toLowerCase().includes(q) ||
+    (b.phone && b.phone.includes(q)) ||
+    b.car.toLowerCase().includes(q)
+  );
+  if (!results.length) {
+    c.innerHTML = `<div class="search-empty"><div>😕</div><div style="font-size:13px;font-weight:600;color:var(--t2);">Keine Ergebnisse für "${q}"</div></div>`;
+    return;
+  }
+  c.innerHTML = '<div style="height:4px;"></div>' + results.map(b => `
+    <div class="search-result" onclick="go('s-detail')">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="sr-plate">${b.plate}</span>
+        <span style="font-size:10px;padding:1px 6px;border-radius:4px;font-weight:700;${b.type==='out'?'background:var(--rd2);color:var(--rd);':'background:var(--b1);color:var(--b5);'}">${b.type==='out'?'RÜCK':'AN'}</span>
+      </div>
+      <div class="sr-name">${b.name}</div>
+      <div class="sr-meta">${b.time} Uhr · ${b.car} · ${b.id}</div>
+    </div>
+  `).join('') + '<div style="height:10px;"></div>';
+}
+
+// ─── NAV ───
+let hist = [];
+function go(id) {
+  const cur = document.querySelector('.screen.active');
+  if(cur){hist.push(cur.id);cur.classList.remove('active');}
+  document.getElementById(id).classList.add('active');
+}
+function goBack() {
+  if(hist.length){const cur=document.querySelector('.screen.active');if(cur)cur.classList.remove('active');document.getElementById(hist.pop()).classList.add('active');}
+  else go('s-list');
+}
+
+// ─── MENU ───
+function openMenu(){const m=document.getElementById('menu');m.style.display='flex';requestAnimationFrame(()=>m.classList.add('slide'));}
+function closeMenu(){const m=document.getElementById('menu');m.classList.remove('slide');setTimeout(()=>m.style.display='none',260);}
+document.getElementById('menu').addEventListener('transitionend',function(){});
+
+// ─── SHEETS ───
+function openSheet(id){document.getElementById(id).classList.add('open');}
+function closeSheet(id){document.getElementById(id).classList.remove('open');}
+
+// ─── FILTER SHEET ───
+function openFilterSheet(){
+  document.getElementById('filter-overlay').classList.add('open');
+  document.getElementById('filter-icon-btn').classList.add('active');
+}
+function closeFilterSheet(){
+  document.getElementById('filter-overlay').classList.remove('open');
+  document.getElementById('filter-icon-btn').classList.remove('active');
+}
+function setTypeBtn(btn){
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ─── EDIT ───
+function closeEditSheet(){
+  const ei=document.getElementById('edit-inner');ei.style.transform='translateY(100%)';
+  setTimeout(()=>document.getElementById('edit-overlay').style.display='none',260);
+}
+
+// ─── LABEL FROM LIST ───
+function showLabelFromList(b) {
+  const retDate = b.type === 'out' ? 'Mo. 9 März 2026' : 'Mi. 4 März 2026';
+  const retTime = b.time;
+  document.getElementById('lbl-date').textContent = retDate;
+  document.getElementById('lbl-time').textContent = retTime + ' Uhr';
+  document.getElementById('lbl-name').textContent = b.name;
+  document.getElementById('lbl-plate').textContent = b.plate;
+  document.getElementById('lbl-car').textContent = b.car !== '—' ? b.car : '';
+  // store for print action
+  window._currentLabelBooking = b;
+  openLabelPreview();
+}
+
+// ─── LABEL ───
+function openLabelPreview_old(){
+  // When called from detail screen, fill with the current booking data
+  if(!document.getElementById('lbl-date').textContent) {
+    document.getElementById('lbl-date').textContent = 'Mo. 9 März 2026';
+    document.getElementById('lbl-time').textContent = '16:00 Uhr';
+    document.getElementById('lbl-name').textContent = 'Horst Pust';
+    document.getElementById('lbl-plate').textContent = 'LRO HM 85';
+    document.getElementById('lbl-car').textContent = '';
+  }
+  document.getElementById('label-preview').style.display='flex';
+}
+function doPrint() {
+  const b = window._currentLabelBooking || {
+    plate: document.getElementById('lbl-plate').textContent,
+    name: document.getElementById('lbl-name').textContent,
+    type:'out'
+  };
+  addPrintLog(b);
+  closeLabelPreview();
+  // Show brief toast
+  const t = document.createElement('div');
+  t.style.cssText = 'position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:#1E3A5F;color:white;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:600;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+  t.textContent = '🖨️ Druckauftrag gesendet';
+  document.querySelector('.phone').appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+function closeLabelPreview(){document.getElementById('label-preview').style.display='none';}
+
+// ─── PAY ───
+function markPaid(method) {
+  const cc = document.getElementById('cost-card');
+  cc.innerHTML = `<div class="card-hd">Kostenübersicht</div><div class="card-bd">
+    <div class="cost-row"><span>Parken · 6 Tage</span><span>47,00 €</span></div>
+    <div class="cost-row"><span>Gesamt</span><span style="font-weight:700;color:var(--tx);">47,00 €</span></div>
+    <div class="cost-row"><span>Bezahlt (${method})</span><span style="color:var(--gr);font-weight:700;">47,00 €</span></div>
+    <div class="cost-paid"><span>Gesamtbetrag fällig</span><span>0,00 €</span></div>
+  </div>`;
+  const pb = document.querySelector('.pay-btns');
+  if(pb) pb.innerHTML = `<div style="background:var(--gr2);border:1px solid var(--gr3);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:7px;width:100%;"><svg style="width:14px;height:14px;fill:var(--gr);" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span style="font-size:12px;font-weight:700;color:var(--gr);">Bezahlt via ${method}</span></div>`;
+
+  // After cash payment, offer receipt by email
+  if (method === 'Cash') {
+    setTimeout(() => showReceiptModal(), 400);
+  }
+}
+
+function showReceiptModal() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('de-DE', {day:'2-digit', month:'long', year:'numeric'});
+  const timeStr = now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+
+  _modal('_receipt_modal', `
+    <div style="width:393px;max-width:100vw;background:white;border-radius:22px 22px 0 0;padding:0 0 28px;animation:slideUp .22s ease;">
+      <div style="padding:12px 18px 10px;border-bottom:1px solid #E5EAFF;">
+        <div style="width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 12px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg style="width:20px;height:20px;fill:white;" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#0A0F2C;">Quittung per E-Mail senden?</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:1px;">Barzahlung · 47,00 € · ${dateStr}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECEIPT PREVIEW -->
+      <div style="margin:12px 16px;border:1.5px solid #E5EAFF;border-radius:12px;overflow:hidden;">
+        <!-- header -->
+        <div style="background:linear-gradient(135deg,#060B20,#101A4A);padding:12px 14px;display:flex;align-items:center;gap:9px;">
+          <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#3B68F0,#00D4FF);display:flex;align-items:center;justify-content:center;">
+            <svg style="width:16px;height:16px;fill:white;" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg>
+          </div>
+          <div>
+            <div style="color:white;font-size:13px;font-weight:800;">Park King</div>
+            <div style="color:rgba(255,255,255,0.4);font-size:9px;">Klövensteen · 25474 Hasloh</div>
+          </div>
+          <div style="margin-left:auto;text-align:right;">
+            <div style="color:rgba(255,255,255,0.5);font-size:8px;">QUITTUNG</div>
+            <div style="color:white;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;">#E3SSZZZ</div>
+          </div>
+        </div>
+        <!-- body -->
+        <div style="padding:11px 14px;background:white;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#4B5563;padding:4px 0;border-bottom:1px solid #F3F4F6;">
+            <span>Kunde</span><span style="font-weight:700;color:#0A0F2C;">Horst Pust</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#4B5563;padding:4px 0;border-bottom:1px solid #F3F4F6;">
+            <span>Fahrzeug</span><span style="font-weight:700;color:#0A0F2C;font-family:'JetBrains Mono',monospace;">LRO HM 85</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#4B5563;padding:4px 0;border-bottom:1px solid #F3F4F6;">
+            <span>Zeitraum</span><span style="font-weight:700;color:#0A0F2C;">4. – 9. März 2026</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#4B5563;padding:4px 0;border-bottom:1px solid #F3F4F6;">
+            <span>Parken · 6 Tage</span><span style="font-weight:700;color:#0A0F2C;">47,00 €</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:#10B981;padding:7px 0 2px;border-top:2px solid #D1FAE5;margin-top:3px;">
+            <span>Bezahlt (Bar)</span><span>47,00 €</span>
+          </div>
+          <div style="font-size:9px;color:#9CA3AF;margin-top:6px;">Ausgestellt: ${dateStr} · ${timeStr} Uhr · Mohammad Pervez Rana</div>
+        </div>
+      </div>
+
+      <!-- EMAIL INPUT -->
+      <div style="padding:0 16px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#4B5563;margin-bottom:6px;">An E-Mail senden:</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input id="receipt-email-inp" type="email" value="horstpust@t-online.de"
+            style="flex:1;border:1.5px solid #E5EAFF;border-radius:9px;padding:9px 12px;font-family:Inter,sans-serif;font-size:13px;color:#0A0F2C;outline:none;background:#F2F5FF;">
+          <button onclick="sendReceipt()" style="padding:9px 16px;background:#1E4ED8;color:white;border:none;border-radius:9px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+            ✉️ Senden
+          </button>
+        </div>
+      </div>
+      <div style="padding:0 16px;">
+        <button onclick="_closeModal('_receipt_modal')" style="width:100%;padding:11px;background:#F2F5FF;border:none;border-radius:9px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:#4B5563;cursor:pointer;">Überspringen</button>
+      </div>
+    </div>
+  `);
+}
+
+function sendReceipt() {
+  const email = document.getElementById('receipt-email-inp')?.value || 'horstpust@t-online.de';
+  _closeModal('_receipt_modal');
+  _toast(`✉️ Quittung gesendet an ${email}`, '#10B981');
+}
+
+// ─── PHOTO ───
+function togglePhoto(c){c.classList.toggle('done');}
+function toggleCheck(r){r.querySelector('.checkbox').classList.toggle('on');}
+
+// ─── NO SHOW ───
+function showSuccess(t){
+  document.getElementById('s-t2').textContent=t==='checkin'?'Check-in erfolgreich!':'Check-out erfolgreich!';
+  document.getElementById('s-s2').textContent=t==='checkin'?'Fahrzeug wurde angenommen.':'Fahrzeug wurde zurückgegeben.';}
+function hideSuccess(){document.getElementById('success').style.display='none';go('s-list');}
+
+
+// ─── MODAL HELPER ───
+function _modal(id, html) {
+  const old = document.getElementById(id);
+  if (old) old.remove();
+  const wrap = document.createElement('div');
+  wrap.id = id;
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;font-family:Inter,sans-serif;';
+  wrap.innerHTML = html;
+  wrap.addEventListener('click', function(e){ if(e.target===wrap) wrap.remove(); });
+  document.body.appendChild(wrap);
+}
+function _closeModal(id){ const el=document.getElementById(id); if(el) el.remove(); }
+
+function showSettSheet() {
+  _modal('_sett', `
+    <div style="width:393px;max-width:100vw;background:white;border-radius:22px 22px 0 0;padding-bottom:30px;animation:slideUp .22s ease;">
+      <div style="width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:12px auto 14px;"></div>
+      <div style="font-size:14px;font-weight:800;color:#0A0F2C;padding:0 18px 12px;border-bottom:1px solid #E5EAFF;">Buchungsoptionen</div>
+      <button onclick="_closeModal('_sett');openEditSheet();" style="display:flex;align-items:center;gap:13px;padding:15px 18px;width:100%;background:none;border:none;border-bottom:1px solid #E5EAFF;cursor:pointer;font-family:Inter,sans-serif;">
+        <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#1E4ED8,#3B68F0);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:18px;height:18px;fill:white;" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+        <div style="text-align:left;"><div style="font-size:14px;font-weight:700;color:#0A0F2C;">Buchung bearbeiten</div><div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Name, Datum, KFZ, Personen…</div></div>
+      </button>
+      <button onclick="_closeModal('_sett');doNoShow();" style="display:flex;align-items:center;gap:13px;padding:15px 18px;width:100%;background:none;border:none;border-bottom:1px solid #E5EAFF;cursor:pointer;font-family:Inter,sans-serif;">
+        <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#6B7280,#4B5563);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:18px;height:18px;fill:white;" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27z"/></svg></div>
+        <div style="text-align:left;"><div style="font-size:14px;font-weight:700;color:#0A0F2C;">No Show</div><div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Buchung als nicht erschienen markieren</div></div>
+      </button>
+      <button onclick="_closeModal('_sett');" style="margin:12px 16px 0;width:calc(100% - 32px);padding:13px;border-radius:11px;background:#F2F5FF;border:none;font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:#4B5563;cursor:pointer;">Abbrechen</button>
+    </div>
+  `);
+}
+
+
+function openEditSheet() {
+  _modal('_edit', `
+    <div style="width:393px;max-width:100vw;background:white;border-radius:22px 22px 0 0;max-height:85vh;display:flex;flex-direction:column;animation:slideUp .22s ease;">
+      <div style="padding:14px 16px;border-bottom:1px solid #E5EAFF;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <span style="font-size:14px;font-weight:800;color:#0A0F2C;">Buchung bearbeiten</span>
+        <button onclick="document.getElementById('_edit').remove();" style="background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;font-size:12px;font-weight:700;color:#1E4ED8;">Abbrechen</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:10px;scrollbar-width:none;">
+        <div style="background:white;border-radius:10px;overflow:hidden;margin-bottom:8px;box-shadow:0 1px 8px rgba(10,15,44,.07);border:1px solid #E5EAFF;">
+          <div style="padding:7px 11px;font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #E5EAFF;">Kundendaten</div>
+          <div style="display:flex;align-items:center;padding:9px 11px;border-bottom:1px solid #E5EAFF;"><span style="font-size:12px;color:#4B5563;flex:1;">Name</span><input style="border:none;outline:none;font-family:Inter,sans-serif;font-size:13px;color:#0A0F2C;text-align:right;background:transparent;flex:1;" value="Horst Pust"></div>
+          <div style="display:flex;align-items:center;padding:9px 11px;border-bottom:1px solid #E5EAFF;"><span style="font-size:12px;color:#4B5563;flex:1;">Handynummer</span><input type="tel" style="border:none;outline:none;font-family:Inter,sans-serif;font-size:13px;color:#0A0F2C;text-align:right;background:transparent;flex:1;" value="015733910609"></div>
+          <div style="display:flex;align-items:center;padding:9px 11px;"><span style="font-size:12px;color:#4B5563;flex:1;">Personen</span><input type="number" style="border:none;outline:none;font-family:Inter,sans-serif;font-size:13px;color:#0A0F2C;text-align:right;background:transparent;width:50px;" value="2"></div>
+        </div>
+        <div style="background:white;border-radius:10px;overflow:hidden;margin-bottom:8px;box-shadow:0 1px 8px rgba(10,15,44,.07);border:1px solid #E5EAFF;">
+          <div style="padding:7px 11px;font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #E5EAFF;">Fahrzeug</div>
+          <div style="display:flex;align-items:center;padding:9px 11px;border-bottom:1px solid #E5EAFF;"><span style="font-size:12px;color:#4B5563;flex:1;">Kennzeichen</span><input style="border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#0A0F2C;text-align:right;background:transparent;flex:1;" value="LRO HM 85"></div>
+          <div style="display:flex;align-items:center;padding:9px 11px;"><span style="font-size:12px;color:#4B5563;flex:1;">Schlüsselcode</span><input style="border:none;outline:none;font-family:Inter,sans-serif;font-size:13px;color:#0A0F2C;text-align:right;background:transparent;flex:1;" value="QR 91"></div>
+        </div>
+        <div style="background:white;border-radius:10px;overflow:hidden;margin-bottom:8px;box-shadow:0 1px 8px rgba(10,15,44,.07);border:1px solid #E5EAFF;">
+          <div style="padding:7px 11px;font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #E5EAFF;">Zeitraum</div>
+          <div style="display:flex;align-items:center;padding:9px 11px;border-bottom:1px solid #E5EAFF;"><span style="font-size:12px;color:#4B5563;flex:1;">Hinreise</span><input type="datetime-local" style="border:none;outline:none;font-family:Inter,sans-serif;font-size:12px;color:#0A0F2C;background:transparent;" value="2026-03-04T12:00"></div>
+          <div style="display:flex;align-items:center;padding:9px 11px;"><span style="font-size:12px;color:#4B5563;flex:1;">Rückkehr</span><input type="datetime-local" style="border:none;outline:none;font-family:Inter,sans-serif;font-size:12px;color:#0A0F2C;background:transparent;" value="2026-03-09T16:00"></div>
+        </div>
+      </div>
+      <div style="padding:10px 12px 16px;flex-shrink:0;">
+        <button onclick="document.getElementById('_edit').remove();" style="width:100%;padding:13px;background:#1E4ED8;color:white;border:none;border-radius:11px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">Änderungen speichern</button>
+      </div>
+    </div>
+  `);
+}
+
+function showLabelModal() {
+  const b = window._currentLabelBooking || {};
+  const retDate = b.type==='out' ? 'Mo. 9 März 2026' : 'Mi. 4 März 2026';
+  const retTime = b.time || '16:00';
+  const name = b.name || 'Horst Pust';
+  const plate = b.plate || 'LRO HM 85';
+  const car = (b.car && b.car !== '—') ? b.car : '';
+  _modal('_label', `
+    <div style="background:transparent;display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:20px;">
+      <div style="background:white;border-radius:13px;padding:14px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+        <div style="font-size:9px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;text-align:center;">Label-Vorschau · Bluetooth</div>
+        <div style="width:100%;aspect-ratio:5/3;border:2px dashed #C4CAD4;border-radius:5px;background:#FAFAFA;padding:10px 14px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
+          <div>
+            <div style="font-size:7px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px;">Rückkehr</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:900;color:#0A0F2C;line-height:1.05;">${retDate}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:900;color:#1E4ED8;line-height:1.05;">${retTime} Uhr</div>
+          </div>
+          <div style="border-top:1px dashed #D1D5DB;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div>
+              <div style="font-size:11px;font-weight:800;color:#0A0F2C;">${name}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#0A0F2C;">${plate}</div>
+              <div style="font-size:9px;color:#4B5563;">${car}</div>
+            </div>
+            <div style="font-size:7px;color:#9CA3AF;text-align:right;line-height:1.4;">Gedruckt:<br><b>Mohammad Pervez Rana</b></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;margin-top:12px;">
+          <button onclick="doPrintLabel('${plate.replace(/'/g,"\'")}','${name.replace(/'/g,"\'")}');document.getElementById('_label').remove();" style="flex:1;padding:9px;background:#1E4ED8;color:white;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">🖨️ Drucken</button>
+          <button onclick="document.getElementById('_label').remove();" style="flex:1;padding:9px;background:#F2F5FF;color:#4B5563;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function openLabelPreview(){ showLabelModal(); }
+function doPrintLabel(plate, name) {
+  addPrintLog({plate, name, type:'out'});
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1E3A5F;color:white;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3);';
+  t.textContent = '🖨️ Druckauftrag gesendet';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+function doNoShow() {
+  const id = window._currentBookingId;
+  if (id) {
+    const b = bookings.find(x => x.id === id);
+    if (b) b.status = 'noshow';
+  }
+  renderList();
+  goBack();
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#374151;color:white;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3);';
+  t.textContent = '🚫 No Show gesetzt';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+// ─── EMPLOYEE CHECK-IN/OUT ───
+const WORK_LAT = 53.6969;   // Klövensteen, 25474 Hasloh
+const WORK_LNG = 9.8986;
+const WORK_RADIUS_M = 300;  // 300m tolerance
+const AUTO_CHECKOUT_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+let empCheckedIn = false;
+let empCheckInTimestamp = null;
+let empTimerInterval = null;
+let empGpsWatcher = null;
+let empCurrentLat = null;
+let empCurrentLng = null;
+let empLastAtWork = null;
+let empAutoCheckoutTimer = null;
+
+function gpsDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function empIsAtWork() {
+  if (empCurrentLat === null) return false;
+  return gpsDistance(empCurrentLat, empCurrentLng, WORK_LAT, WORK_LNG) <= WORK_RADIUS_M;
+}
+
+function empStartGPS() {
+  if (!navigator.geolocation) {
+    document.getElementById('emp-gps-text').textContent = 'GPS nicht verfügbar';
+    return;
+  }
+  empGpsWatcher = navigator.geolocation.watchPosition(
+    pos => {
+      empCurrentLat = pos.coords.latitude;
+      empCurrentLng = pos.coords.longitude;
+      const dist = Math.round(gpsDistance(empCurrentLat, empCurrentLng, WORK_LAT, WORK_LNG));
+      const atWork = dist <= WORK_RADIUS_M;
+      const icon = document.getElementById('emp-gps-icon');
+      const text = document.getElementById('emp-gps-text');
+      if (icon) icon.style.fill = atWork ? 'var(--gr)' : 'var(--or)';
+      if (text) text.textContent = atWork
+        ? '📍 Am Standort Klövensteen'
+        : `📍 ${dist}m vom Standort entfernt`;
+      // Auto-checkout logic: if checked in and away > 2h
+      if (empCheckedIn) {
+        if (atWork) {
+          empLastAtWork = Date.now();
+          clearTimeout(empAutoCheckoutTimer);
+        } else if (empLastAtWork !== null) {
+          const awayMs = Date.now() - empLastAtWork;
+          if (awayMs >= AUTO_CHECKOUT_MS) {
+            empDoCheckout(true);
+          } else {
+            clearTimeout(empAutoCheckoutTimer);
+            empAutoCheckoutTimer = setTimeout(() => empDoCheckout(true), AUTO_CHECKOUT_MS - awayMs);
+          }
+        }
+      }
+    },
+    err => {
+      const text = document.getElementById('emp-gps-text');
+      if (text) text.textContent = 'GPS-Zugriff verweigert';
+    },
+    { enableHighAccuracy: true, maximumAge: 30000, timeout: 15000 }
+  );
+}
+
+function empCheckIn() {
+  // Start GPS first
+  empStartGPS();
+  empCheckedIn = true;
+  empCheckInTimestamp = Date.now();
+  empLastAtWork = Date.now();
+
+  const t = new Date(empCheckInTimestamp);
+  document.getElementById('emp-checkin-time').textContent =
+    t.getHours().toString().padStart(2,'0') + ':' + t.getMinutes().toString().padStart(2,'0');
+
+  document.getElementById('emp-status-badge').textContent = '● Eingecheckt';
+  document.getElementById('emp-status-badge').style.cssText = 'font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#ECFDF5;color:#10B981;border:1px solid #D1FAE5;';
+  document.getElementById('emp-timer-row').style.display = 'flex';
+  document.getElementById('emp-btn-in').style.display = 'none';
+  document.getElementById('emp-btn-out').style.display = 'block';
+
+  empTimerInterval = setInterval(() => {
+    const elapsed = Date.now() - empCheckInTimestamp;
+    const h = Math.floor(elapsed/3600000).toString().padStart(2,'0');
+    const m = Math.floor((elapsed%3600000)/60000).toString().padStart(2,'0');
+    const s = Math.floor((elapsed%60000)/1000).toString().padStart(2,'0');
+    const el = document.getElementById('emp-timer-display');
+    if (el) el.textContent = h + ':' + m + ':' + s;
+  }, 1000);
+
+  _toast('✓ Eingecheckt – Arbeitszeit läuft', '#10B981');
+}
+
+function empCheckOut() {
+  if (!empIsAtWork() && empCurrentLat !== null) {
+    _modal('_gps_warn', `
+      <div style="width:393px;max-width:100vw;background:white;border-radius:22px 22px 0 0;padding:20px 18px 30px;animation:slideUp .22s ease;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:36px;margin-bottom:8px;">📍</div>
+          <div style="font-size:15px;font-weight:800;color:#0A0F2C;">Nicht am Standort</div>
+          <div style="font-size:12px;color:#9CA3AF;margin-top:6px;">Du musst am Klövensteen, 25474 Hasloh sein um auszuchecken.</div>
+        </div>
+        <button onclick="_closeModal('_gps_warn');" style="width:100%;padding:13px;background:#F2F5FF;border:none;border-radius:11px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:#4B5563;cursor:pointer;">OK</button>
+      </div>
+    `);
+    return;
+  }
+  empDoCheckout(false);
+}
+
+function empDoCheckout(auto) {
+  clearInterval(empTimerInterval);
+  clearTimeout(empAutoCheckoutTimer);
+  if (empGpsWatcher !== null) navigator.geolocation.clearWatch(empGpsWatcher);
+
+  const elapsed = Date.now() - empCheckInTimestamp;
+  const h = Math.floor(elapsed/3600000).toString().padStart(2,'0');
+  const m = Math.floor((elapsed%3600000)/60000).toString().padStart(2,'0');
+  const ciTime = document.getElementById('emp-checkin-time').textContent;
+  const coTime = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+
+  // Collect bookings checked in during this shift (demo: pick first 7 as "annahmen", 3 as "rückgaben")
+  const annahmen = bookings.filter(b => b.type === 'in').slice(0,7);
+  const rueckgaben = bookings.filter(b => b.type === 'out').slice(0,3);
+
+  const bookingRows = (list, color, label) => list.map(b => `
+    <div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #F3F4F6;">
+      <div style="width:4px;height:32px;border-radius:2px;background:${color};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;color:#0A0F2C;font-family:'JetBrains Mono',monospace;">${b.plate}</div>
+        <div style="font-size:10px;color:#9CA3AF;">${b.name}</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#6B7280;">${b.time}</div>
+    </div>`).join('');
+
+  _modal('_shift_summary', `
+    <div style="width:393px;max-width:100vw;background:white;border-radius:22px 22px 0 0;max-height:88vh;display:flex;flex-direction:column;animation:slideUp .22s ease;">
+      <div style="padding:12px 18px 10px;border-bottom:1px solid #E5EAFF;flex-shrink:0;">
+        <div style="width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 10px;"></div>
+        <div style="font-size:16px;font-weight:800;color:#0A0F2C;">${auto ? '⚠️ Auto-Ausgecheckt' : '⇥ Schicht beendet'}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Mohammad Pervez Rana · ${ciTime} – ${coTime} Uhr · ${h}:${m}h</div>
+      </div>
+      <!-- STATS -->
+      <div style="display:flex;gap:0;border-bottom:1px solid #E5EAFF;flex-shrink:0;">
+        <div style="flex:1;padding:12px;text-align:center;border-right:1px solid #E5EAFF;">
+          <div style="font-size:24px;font-weight:900;color:#10B981;">${annahmen.length}</div>
+          <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;">Angenommen</div>
+        </div>
+        <div style="flex:1;padding:12px;text-align:center;border-right:1px solid #E5EAFF;">
+          <div style="font-size:24px;font-weight:900;color:#EF4444;">${rueckgaben.length}</div>
+          <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;">Zurückgegeben</div>
+        </div>
+        <div style="flex:1;padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:900;color:#1E4ED8;">${h}:${m}</div>
+          <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;">Std. gearbeitet</div>
+        </div>
+      </div>
+      <!-- BOOKING LIST -->
+      <div style="flex:1;overflow-y:auto;padding:12px 18px;">
+        <div style="font-size:10px;font-weight:700;color:#10B981;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">✓ Annahmen</div>
+        ${bookingRows(annahmen, '#10B981', 'in')}
+        <div style="font-size:10px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px;">⇥ Rückgaben</div>
+        ${bookingRows(rueckgaben, '#EF4444', 'out')}
+      </div>
+      <div style="padding:12px 18px 28px;flex-shrink:0;">
+        <button onclick="_closeModal('_shift_summary');_finishCheckout();" style="width:100%;padding:13px;background:#1E4ED8;color:white;border:none;border-radius:11px;font-family:Inter,sans-serif;font-size:13px;font-weight:800;cursor:pointer;">Schicht abschließen & speichern</button>
+      </div>
+    </div>
+  `);
+}
+
+function _finishCheckout() {
+  empCheckedIn = false;
+  document.getElementById('emp-status-badge').textContent = 'Nicht eingecheckt';
+  document.getElementById('emp-status-badge').style.cssText = 'font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FEF2F2;color:#EF4444;border:1px solid #FECACA;';
+  document.getElementById('emp-timer-row').style.display = 'none';
+  document.getElementById('emp-btn-in').style.display = 'block';
+  document.getElementById('emp-btn-out').style.display = 'none';
+  document.getElementById('emp-gps-text').textContent = 'GPS wird ermittelt…';
+  document.getElementById('emp-gps-icon').style.fill = 'var(--t3)';
+  _toast('✓ Schicht gespeichert', '#10B981');
+}
+
+function showShiftLog(name, ciT, coT, annahmen, rueck) {
+  const demoBookings = bookings.slice(0, parseInt(annahmen));
+  const demoOut = bookings.filter(b=>b.type==='out').slice(0, parseInt(rueck));
+  const bookingRow = (b, color) => `
+    <div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #F3F4F6;">
+      <div style="width:4px;height:32px;border-radius:2px;background:${color};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;color:#0A0F2C;font-family:'JetBrains Mono',monospace;">${b.plate}</div>
+        <div style="font-size:10px;color:#9CA3AF;">${b.name}</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#6B7280;">${b.time}</div>
+    </div>`;
+  _modal('_shiftlog', `
+    <div style="width:393px;max-width:100vw;background:white;border-radius:22px 22px 0 0;max-height:88vh;display:flex;flex-direction:column;animation:slideUp .22s ease;">
+      <div style="padding:12px 18px 10px;border-bottom:1px solid #E5EAFF;flex-shrink:0;">
+        <div style="width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 10px;"></div>
+        <div style="font-size:15px;font-weight:800;color:#0A0F2C;">${name}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">${ciT} – ${coT} Uhr · Mo. 1. März 2026</div>
+      </div>
+      <div style="display:flex;gap:0;border-bottom:1px solid #E5EAFF;flex-shrink:0;">
+        <div style="flex:1;padding:11px;text-align:center;border-right:1px solid #E5EAFF;">
+          <div style="font-size:22px;font-weight:900;color:#10B981;">${annahmen}</div>
+          <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;">Angenommen</div>
+        </div>
+        <div style="flex:1;padding:11px;text-align:center;">
+          <div style="font-size:22px;font-weight:900;color:#EF4444;">${rueck}</div>
+          <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;">Zurückgegeben</div>
+        </div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:12px 18px;">
+        <div style="font-size:10px;font-weight:700;color:#10B981;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">✓ Annahmen</div>
+        ${demoBookings.map(b=>bookingRow(b,'#10B981')).join('')}
+        <div style="font-size:10px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px;">⇥ Rückgaben</div>
+        ${demoOut.map(b=>bookingRow(b,'#EF4444')).join('')}
+      </div>
+      <div style="padding:12px 18px 28px;flex-shrink:0;">
+        <button onclick="_closeModal('_shiftlog');" style="width:100%;padding:13px;background:#F2F5FF;border:none;border-radius:11px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;color:#4B5563;cursor:pointer;">Schließen</button>
+      </div>
+    </div>
+  `);
+}
+
+function _toast(msg, color) {
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:${color};color:white;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:700;z-index:99999;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,0.25);font-family:Inter,sans-serif;`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+function toggleKey(id, btn) {
+  const b = bookings.find(x => x.id === id);
+  if (!b) return;
+  b.keyHandedIn = !b.keyHandedIn;
+  const on = b.keyHandedIn;
+  btn.style.border = `1px solid ${on ? 'rgba(22,163,74,0.3)' : 'rgba(239,68,68,0.25)'}`;
+  btn.style.background = on ? 'var(--gr2)' : 'var(--rd2)';
+  btn.style.color = on ? 'var(--gr)' : 'var(--rd)';
+  btn.textContent = on ? '🔑 Abgegeben' : '🔑 Schlüssellos';
+  _toast(on ? '🔑 Schlüssel abgegeben' : '🔑 Schlüssellos markiert', on ? '#10B981' : '#EF4444');
+}
+
+let ciKeyStatus = 'no';
+function setCiKey(status) {
+  ciKeyStatus = status;
+  const no = document.getElementById('ci-key-no');
+  const yes = document.getElementById('ci-key-yes');
+  if (status === 'yes') {
+    yes.style.cssText = 'flex:1;padding:10px 6px;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--gr);background:var(--gr2);color:var(--gr);';
+    no.style.cssText = 'flex:1;padding:10px 6px;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);';
+  } else {
+    no.style.cssText = 'flex:1;padding:10px 6px;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--rd);background:var(--rd2);color:var(--rd);';
+    yes.style.cssText = 'flex:1;padding:10px 6px;border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);';
+  }
+}
+
+let newKeyStatus = 'no';
+function setKeyStatus(status) {
+  newKeyStatus = status;
+  const no = document.getElementById('key-btn-no');
+  const yes = document.getElementById('key-btn-yes');
+  if (status === 'yes') {
+    yes.style.cssText = 'padding:6px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--gr);background:var(--gr2);color:var(--gr);';
+    no.style.cssText = 'padding:6px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);';
+  } else {
+    no.style.cssText = 'padding:6px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--rd);background:var(--rd2);color:var(--rd);';
+    yes.style.cssText = 'padding:6px 12px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);';
+  }
+}
+
+let detKeyStatus = 'no';
+function detToggleKey(status) {
+  detKeyStatus = status;
+  const no = document.getElementById('det-key-no');
+  const yes = document.getElementById('det-key-yes');
+  if (status === 'yes') {
+    yes.style.cssText = 'flex:1;padding:4px 6px;border-radius:6px;font-family:inherit;font-size:8px;font-weight:700;cursor:pointer;border:1px solid rgba(52,211,153,0.5);background:rgba(52,211,153,0.15);color:#6EE7B7;';
+    no.style.cssText = 'flex:1;padding:4px 6px;border-radius:6px;font-family:inherit;font-size:8px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);';
+  } else {
+    no.style.cssText = 'flex:1;padding:4px 6px;border-radius:6px;font-family:inherit;font-size:8px;font-weight:700;cursor:pointer;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.15);color:#FCA5A5;';
+    yes.style.cssText = 'flex:1;padding:4px 6px;border-radius:6px;font-family:inherit;font-size:8px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);';
+  }
+}
+
+// ─── NEW BOOKING PAYMENT ───
+let newPayStatus = 'unpaid';
+let newPayMethod = 'Cash';
+
+function setNewPayStatus(status) {
+  newPayStatus = status;
+  const unpaidBtn = document.getElementById('pay-status-unpaid');
+  const paidBtn = document.getElementById('pay-status-paid');
+  const methodRow = document.getElementById('pay-method-row');
+  if (status === 'paid') {
+    paidBtn.style.cssText = 'flex:1;padding:8px 6px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--gr);background:var(--gr2);color:var(--gr);';
+    unpaidBtn.style.cssText = 'flex:1;padding:8px 6px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);';
+    methodRow.style.display = 'flex';
+  } else {
+    unpaidBtn.style.cssText = 'flex:1;padding:8px 6px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--rd);background:var(--rd2);color:var(--rd);';
+    paidBtn.style.cssText = 'flex:1;padding:8px 6px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);background:white;color:var(--t3);';
+    methodRow.style.display = 'none';
+  }
+}
+
+function setPayMethod(btn, method) {
+  newPayMethod = method;
+  document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function createBooking() {
+  _toast('✓ Buchung wurde erstellt', '#10B981');
+  setTimeout(() => go('s-list'), 600);
+}
+
+// ─── WEEK NAVIGATION ───
+let empWeekOffset = 0;
+const DE_DAYS = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+const DE_MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+function empGetWeekStart(offset) {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+  monday.setHours(0,0,0,0);
+  return monday;
+}
+
+function empUpdateWeekDisplay() {
+  const start = empGetWeekStart(empWeekOffset);
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  const label = empWeekOffset === 0 ? 'Diese Woche' : empWeekOffset === 1 ? 'Nächste Woche' : empWeekOffset === -1 ? 'Letzte Woche' : `KW ${empGetKW(start)}`;
+  const range = `${start.getDate()} – ${end.getDate()} ${DE_MONTHS[end.getMonth()]}`;
+  document.getElementById('emp-week-label').textContent = label;
+  document.getElementById('emp-week-range').textContent = range;
+  document.getElementById('emp-today-btn').style.display = empWeekOffset !== 0 ? 'block' : 'none';
+  // Show/hide check-in card only for current week
+  const ciCard = document.getElementById('emp-ci-card');
+  if (ciCard) ciCard.style.display = empWeekOffset === 0 ? 'block' : 'none';
+}
+
+function empGetKW(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+function empChangeWeek(dir) {
+  empWeekOffset += dir;
+  empUpdateWeekDisplay();
+}
+
+function empGoToday() {
+  empWeekOffset = 0;
+  empUpdateWeekDisplay();
+}
+
+// ─── INIT ───
+renderList();
+empUpdateWeekDisplay();
+</script>
+</body>
+</html>
