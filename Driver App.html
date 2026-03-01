@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#060B20">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Park King">
+<meta name="description" content="Park King – Valet Parking Management">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231E4ED8'/><path d='M25 65l13-38h5l13 38h-5l-3-9H33l-3 9zm9-13h9l-4.5-13z' fill='white'/></svg>">
 <title>Park King</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -2086,6 +2094,45 @@ function empGoToday() {
 // ─── INIT ───
 renderList();
 empUpdateWeekDisplay();
+</script>
+<script>
+// Inject manifest dynamically
+const manifest = {
+  name: "Park King",
+  short_name: "Park King",
+  description: "Valet Parking Management App",
+  start_url: "/",
+  display: "standalone",
+  background_color: "#060B20",
+  theme_color: "#060B20",
+  orientation: "portrait",
+  icons: [
+    {
+      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231E4ED8'/><path d='M130 340l66-195h26l66 195h-26l-15-46H171l-15 46zm46-67h46l-23-67z' fill='white'/></svg>",
+      sizes: "512x512",
+      type: "image/svg+xml",
+      purpose: "any maskable"
+    }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = url;
+document.head.appendChild(link);
+
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+  `;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl);
+}
 </script>
 </body>
 </html>
